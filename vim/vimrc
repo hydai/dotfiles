@@ -1,286 +1,387 @@
+" Modeline and Notes {
+" vim: set sw=4 ts=4 sts=4 et tw=78 foldmarker={,} foldlevel=0 foldmethod=marker spell:
+"
 " hydai's vimrc
-" Modify from vgod's vimrc  https://github.com/vgod/vimrc
-
-" read https://github.com/vgod/vimrc/blob/master/README.md for more info
-set shell=bash\ -i
-
-" For pathogen.vim: auto load all plugins in .vim/bundle
-let g:pathogen_disabled = []
-if !has('gui_running')
-   call add(g:pathogen_disabled, 'powerline')
-endif
-
-call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
-
-" General Settings
-
-set nocompatible	" not compatible with the old-fashion vi mode
-set ts=4            " tab space
-set bs=2		    " allow backspacing over everything in insert mode
-set history=50		" keep 50 lines of command line history
-set ruler		    " show the cursor position all the time
-set autoread		" auto read when file is changed from outside
-set nu              " show line number"
-set hlsearch		" search highlighting
-
-filetype on           " Enable filetype detection
-filetype indent on    " Enable filetype-specific indenting
-filetype plugin on    " Enable filetype-specific plugins
-
-au BufNewFile,BufRead *.md set filetype=markdown
-
-" auto reload vimrc when editing it
-autocmd! bufwritepost .vimrc source ~/.vimrc
-
-syntax on		" syntax highlight
-
-if has("gui_running")	" GUI color and font settings
-  set guifont=Osaka-Mono:h20
-  set background=dark 
-  set t_Co=256          " 256 color mode
-  set cursorline        " highlight current line
-  colors moria
-  highlight CursorLine          guibg=#003853 ctermbg=24  gui=none cterm=none
-else
-" terminal color settings
-  colors vgod
-endif
-
-set clipboard=unnamed	" yank to the system register (*) by default
-set showmatch		    " Cursor shows matching ) and }
-set showmode		    " Show current mode
-set wildchar=<TAB>	    " start wild expansion in the command line using <TAB>
-set wildmenu            " wild char completion menu
-
-" ignore these files while expanding wild chars
-set wildignore=*.o,*.class,*.pyc
-
-set autoindent		" auto indentation
-set incsearch		" incremental search
-set nobackup		" no *~ backup files
-set copyindent		" copy the previous indentation on autoindenting
-set ignorecase		" ignore case when searching
-set smartcase		" ignore case if search pattern is all lowercase,case-sensitive otherwise
-set smarttab		" insert tabs on the start of a line according to context
-
-" disable sound on errors
-set noerrorbells
-set novisualbell
-set t_vb=
-set tm=500
-
-" TAB setting{
-   set expandtab        "replace <TAB> with spaces
-   set softtabstop=4 
-   set shiftwidth=4 
-
-   au FileType Makefile set noexpandtab
-   au FileType html,css,js set expandtab softtabstop=2 shiftwidth=2
-   au FileType ruby set softtabstop=2 tabstop=2 shiftwidth=2
-"}      							
-
-" status line {
-set laststatus=2
-set statusline=\ %{HasPaste()}%<%-15.25(%f%)%m%r%h\ %w\ \ 
-set statusline+=\ \ \ [%{&ff}/%Y] 
-set statusline+=\ \ \ %<%20.30(%{CurDir()}%)\ 
-set statusline+=%=%-10.(%l,%c%V%)\ %p%%/%L
-
-function! CurDir()
-    let curdir = substitute(getcwd(), $HOME, "~", "")
-    return curdir
-endfunction
-
-function! HasPaste()
-    if &paste
-        return '[PASTE]'
-    else
-        return ''
-    endif
-endfunction
-
-"}
-
-
-" C/C++ specific settings
-autocmd FileType c,cpp,cc  set cindent comments=sr:/*,mb:*,el:*/,:// cino=>s,e0,n0,f0,{0,}0,^-1s,:0,=s,g0,h1s,p2,t0,+2,(2,)20,*30
-
-"Restore cursor to file position in previous editing session
-set viminfo='10,\"100,:20,%,n~/.viminfo
-au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
-
-"--------------------------------------------------------------------------- 
-" Tip #382: Search for <cword> and replace with input() in all open buffers 
-"--------------------------------------------------------------------------- 
-fun! Replace() 
-    let s:word = input("Replace " . expand('<cword>') . " with:") 
-    :exe 'bufdo! %s/\<' . expand('<cword>') . '\>/' . s:word . '/ge' 
-    :unlet! s:word 
-endfun 
-
-
-"--------------------------------------------------------------------------- 
-" USEFUL SHORTCUTS
-"--------------------------------------------------------------------------- 
-" set leader to ,
-let mapleader=","
-let g:mapleader=","
-
-"replace the current word in all opened buffers
-map <leader>r :call Replace()<CR>
-
-" open the error console
-map <leader>cc :botright cope<CR> 
-" move to next error
-map <leader>] :cn<CR>
-" move to the prev error
-map <leader>[ :cp<CR>
-
-" --- move around splits {
-" move to and maximize the below split 
-map <C-J> <C-W>j<C-W>_
-" move to and maximize the above split 
-map <C-K> <C-W>k<C-W>_
-" move to and maximize the left split 
-nmap <c-h> <c-w>h<c-w><bar>
-" move to and maximize the right split  
-nmap <c-l> <c-w>l<c-w><bar>
-set wmw=0                     " set the min width of a window to 0 so we can maximize others 
-set wmh=0                     " set the min height of a window to 0 so we can maximize others
+" This vimrc is inspired by spf13-vim.
 " }
 
-" move around tabs. conflict with the original screen top/bottom
-" comment them out if you want the original H/L
-" go to prev tab 
-map <S-H> gT
-" go to next tab
-map <S-L> gt
+" Environments {
 
-" new tab
-map <C-t><C-t> :tabnew<CR>
-" close tab
-map <C-t><C-w> :tabclose<CR> 
+    " Basics {
+        set nocompatible            " Must be first line.
+        set background=dark         " Set dark background.
+        "set shell=/usr/bin/env zsh  " Set zsh as default shell
+        scriptencoding utf-8        " Set utf-8 as default encoding
+    " }
 
-" ,/ turn off search highlighting
-nmap <leader>/ :nohl<CR>
+" }
 
-" ,p toggles paste mode
-nmap <leader>p :set paste!<BAR>set paste?<CR>
+" Setup Plug Support {
+    " Initialize Plug.vim
+    call plug#begin()
+    " Misc
+    Plug 'tomtom/tlib_vim'
+    Plug 'MarcWeber/vim-addon-mw-utils'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-fugitive'
+    " Color
+    Plug 'altercation/vim-colors-solarized'
+    Plug 'spf13/vim-colors'
+    Plug 'flazz/vim-colorschemes'
+    " Programming
+    Plug 'godlygeek/tabular'
+    " Writing
+    Plug 'kana/vim-textobj-user'
+    Plug 'kana/vim-textobj-indent'
+    Plug 'reedes/vim-textobj-sentence'
+    Plug 'reedes/vim-textobj-quote'
+    Plug 'reedes/vim-litecorrect'
+    " NerdTree
+    Plug 'scrooloose/nerdtree'
+    Plug 'jistr/vim-nerdtree-tabs'
+    call plug#end()
+" }
 
-" allow multiple indentation/deindentation in visual mode
-vnoremap < <gv
-vnoremap > >gv
+" General {
+    filetype plugin indent on                       " Automatically detect file types.
+    syntax on                                       " Syntax highlighting
+    set mouse=a                                     " Automatically enable mouse usage
+    set mousehide                                   " Hide the mouse cursor while typing
+    set shortmess+=filmnrxoOtT                      " Abbrev. of messages (avoids 'hit enter')
+    set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
+    set virtualedit=onemore                         " Allow for cursor beyond last character
+    set history=1000                                " Store a ton of history (default is 20)
+    set spell                                       " Spell checking on
+    set hidden                                      " Allow buffer switching without saving
+    set iskeyword-=.                                " '.' is an end of word designator
+    set iskeyword-=#                                " '#' is an end of word designator
+    set iskeyword-=-                                " '-' is an end of word designator
+" }
 
-" :cd. change working directory to that of the current file
-cmap cd. lcd %:p:h
+" Applications' Settings {
+    " Git {
+        " Instead of reverting the cursor to the last position in the buffer, we
+        " set it to the first line when editing a git commit message
+        au FileType gitcommit au! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
+    " }
+" }
 
-"--------------------------------------------------------------------------- 
-" PROGRAMMING SHORTCUTS
-"--------------------------------------------------------------------------- 
+" Vim UI {
+    if filereadable(expand("~/.vim/plugged/vim-colors-solarized/colors/solarized.vim"))
+        set t_Co=256
+        let g:solarized_termcolors=256
+        let g:solarized_termtrans=1
+        let g:solarized_contrast="normal"
+        let g:solarized_visibility="normal"
+        color solarized             " Load a colorscheme
+    endif
 
-" ,g generates the header guard
-map <leader>g :call IncludeGuard()<CR>
-fun! IncludeGuard()
-   let basename = substitute(bufname(""), '.*/', '', '')
-   let guard = substitute(toupper(basename), '\.', '_', "H")
-   call append(0, "#ifndef " . guard)
-   call append(1, "#define " . guard)
-   call append( line("$"), "#endif // for #ifndef " . guard)
-endfun
+    set tabpagemax=15               " Only show 15 tabs
+    set showmode                    " Display the current mode
 
-" use syntax complete if nothing else available
-if has("autocmd") && exists("+omnifunc")
-  autocmd Filetype *
-              \	if &omnifunc == "" |
-              \		setlocal omnifunc=syntaxcomplete#Complete |
-              \	endif
-endif
+    set cursorline                  " Highlight current line
 
-set cot-=preview "disable doc preview in omnicomplete
+    highlight clear SignColumn      " SignColumn should match background
+    highlight clear LineNr          " Current line number row will have same background color in relative mode
+    "highlight clear CursorLineNr    " Remove highlight color from current line number
 
-"--------------------------------------------------------------------------- 
-" ENCODING SETTINGS
-"--------------------------------------------------------------------------- 
-set encoding=utf-8                                  
-set termencoding=utf-8
-set fileencoding=utf-8
-set fileencodings=ucs-bom,utf-8,big5,gb2312,latin1
+    if has('cmdline_info')
+        set ruler                   " Show the ruler
+        set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " A ruler on steroids
+        set showcmd                 " Show partial commands in status line and
+        " Selected characters/lines in visual mode
+    endif
 
-fun! ViewUTF8()
-	set encoding=utf-8                                  
-	set termencoding=big5
-endfun
+    if has('statusline')
+        set laststatus=2
 
-fun! UTF8()
-	set encoding=utf-8                                  
-	set termencoding=big5
-	set fileencoding=utf-8
-	set fileencodings=ucs-bom,big5,utf-8,latin1
-endfun
+        " Broken down into easily includeable segments
+        set statusline=%<%f\                     " Filename
+        set statusline+=%w%h%m%r                 " Options
+        if !exists('g:override_spf13_bundles')
+            set statusline+=%{fugitive#statusline()} " Git Hotness
+        endif
+        set statusline+=\ [%{&ff}/%Y]            " Filetype
+        set statusline+=\ [%{getcwd()}]          " Current dir
+        set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
+    endif
 
-fun! Big5()
-	set encoding=big5
-	set fileencoding=big5
-endfun
-
-
-"--------------------------------------------------------------------------- 
-" PLUGIN SETTINGS
-"--------------------------------------------------------------------------- 
-
-" Markdown
-augroup markdown
-    au!
-    au BufNewFile,BufRead *.md,*.markdown setlocal filetype=markdown
-augroup END
-
-" ------- vim-latex - many latex shortcuts and snippets {
-
-" IMPORTANT: win32 users will need to have 'shellslash' set so that latex
-" can be called correctly.
-set shellslash
-set grepprg=grep\ -nH\ $*
-" OPTIONAL: Starting with Vim 7, the filetype of empty .tex files defaults to
-" 'plaintex' instead of 'tex', which results in vim-latex not being loaded.
-" The following changes the default filetype back to 'tex':
-let g:tex_flavor='latex'
-
-"}
-
-
-" --- AutoClose - Inserts matching bracket, paren, brace or quote 
-" fixed the arrow key problems caused by AutoClose
-if !has("gui_running")	
-   set term=linux
-   imap OA <ESC>ki
-   imap OB <ESC>ji
-   imap OC <ESC>li
-   imap OD <ESC>hi
-
-   nmap OA k
-   nmap OB j
-   nmap OC l
-   nmap OD h
-endif
+    set backspace=indent,eol,start  " Backspace for dummies
+    set linespace=0                 " No extra spaces between rows
+    set number                      " Line numbers on
+    set showmatch                   " Show matching brackets/parenthesis
+    set incsearch                   " Find as you type search
+    set hlsearch                    " Highlight search terms
+    set winminheight=0              " Windows can be 0 line high
+    set ignorecase                  " Case insensitive search
+    set smartcase                   " Case sensitive when uc present
+    set wildmenu                    " Show list instead of just completing
+    set wildmode=list:longest,full  " Command <Tab> completion, list matches, then longest common part, then all.
+    set whichwrap=b,s,h,l,<,>,[,]   " Backspace and cursor keys wrap too
+    set scrolljump=5                " Lines to scroll when cursor leaves screen
+    set scrolloff=3                 " Minimum lines to keep above and below cursor
+    set foldenable                  " Auto fold code
+    set list
+    set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic whitespace
+" }
 
 
-" --- SuperTab
-let g:SuperTabDefaultCompletionType = "context"
-let g:SuperTabCompletionContexts = ['s:ContextText', 's:ContextDiscover']
-let g:SuperTabContextDiscoverDiscovery = ["&completefunc:<c-x><c-p>"]
+" Formatting {
+    set nowrap                      " Do not wrap long lines
+    set autoindent                  " Indent at the same level of the previous line
+    set shiftwidth=4                " Use indents of 4 spaces
+    set expandtab                   " Tabs are spaces, not tabs
+    set tabstop=4                   " An indentation every four columns
+    set softtabstop=4               " Let backspace delete indent
+    set nojoinspaces                " Prevents inserting two spaces after punctuation on a join (J)
+    set splitright                  " Puts new vsplit windows to the right of the current
+    set splitbelow                  " Puts new split windows to the bottom of the current
+    "set matchpairs+=<:>             " Match, to be used with %
+    set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
+    "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
+    " Remove trailing whitespaces and ^M chars
+    autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> if call StripTrailingWhitespace() | endif
+    autocmd Filetype javascript setlocal ts=2 sts=0 sw=2
+    "autocmd FileType go autocmd BufWritePre <buffer> Fmt
+    autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
+    autocmd FileType haskell,ruby,yml setlocal expandtab shiftwidth=2 softtabstop=2
+    " preceding line best in a plugin but here for now.
+    autocmd BufNewFile,BufRead *.coffee set filetype=coffee
+    autocmd FileType haskell setlocal commentstring=--\ %s " Workaround vim-commentary for Haskell
+    autocmd FileType haskell,rust setlocal nospell " Workaround broken colour highlighting in Haskell
+" }
+
+" Key (re)Mappings {
+    " Set key leader.
+    let mapleader = ','
+    let maplocalleader = '_'
+
+    " Wrapped lines goes down/up to next row, rather than next line in file.
+    noremap j gj
+    noremap k gk
+
+    " Yank from the cursor to the end of the line, to be consistent with C and D.
+    nnoremap Y y$
+
+    " Code folding options
+    nmap <leader>f0 :set foldlevel=0<CR>
+    nmap <leader>f1 :set foldlevel=1<CR>
+    nmap <leader>f2 :set foldlevel=2<CR>
+    nmap <leader>f3 :set foldlevel=3<CR>
+    nmap <leader>f4 :set foldlevel=4<CR>
+    nmap <leader>f5 :set foldlevel=5<CR>
+    nmap <leader>f6 :set foldlevel=6<CR>
+    nmap <leader>f7 :set foldlevel=7<CR>
+    nmap <leader>f8 :set foldlevel=8<CR>
+    nmap <leader>f9 :set foldlevel=9<CR>
+
+    " Toggle search highlighting
+    nmap <silent> <leader>/ :set invhlsearch<CR>
+
+    " Find merge conflict markers
+    map <leader>fc /\v^[<\|=>]{7}( .*\|$)<CR>
+
+    " Shortcuts
+    " Change Working Directory to that of the current file
+    cmap cwd lcd %:p:h
+    cmap cd. lcd %:p:h
+
+    " Visual shifting (does not exit Visual mode)
+    vnoremap < <gv
+    vnoremap > >gv
+
+    " Allow using the repeat operator with a visual selection (!)
+    " http://stackoverflow.com/a/8064607/127816
+    vnoremap . :normal .<CR>
+
+    " For when you forget to sudo.. Really Write the file.
+    cmap w!! w !sudo tee % >/dev/null
+
+    " Easier formatting
+    nnoremap <silent> <leader>q gwip
+" }
 
 
-" --- NERDTree
-" with F8
-nnoremap <silent> <F8> :NERDTreeToggle<CR> 
+" Misc {
+    " Clipboard {
+        if has('clipboard')
+            if has('unnamedplus')  " When possible use + register for copy-paste
+                set clipboard=unnamed,unnamedplus
+            else                   " On mac and Windows, use * register for copy-paste
+                set clipboard=unnamed
+            endif
+        endif
+    " }
 
-" --- SnipMate
-let g:snipMateAllowMatchingDot = 0
+    " Autochdir {
+        let g:no_autochdir = 1
+        if !exists('g:no_autochdir')
+            autocmd BufEnter * if bufname("") !~ "^\[A-Za-z0-9\]*://" | lcd %:p:h | endif
+        endif
+    " }
 
-" --- coffee-script
-au BufWritePost *.coffee silent CoffeeMake! -b | cwindow | redraw! " recompile coffee scripts on write
+    " Restore cursor position {
+        " http://vim.wikia.com/wiki/Restore_cursor_to_file_position_in_previous_editing_session
+        " Restore cursor to file position in previous editing session
+        function! ResCur()
+            if line("'\"") <= line("$")
+                silent! normal! g`"
+                return 1
+            endif
+        endfunction
 
-" --- VIM folding setting
-au BufWinLeave * mkview
-au BufWinEnter * silent loadview
+        augroup resCur
+            autocmd!
+            autocmd BufWinEnter * call ResCur()
+        augroup END
+    " }
+
+    " Setting up the directories {
+        set backup                      " Enable backup
+        if has('persistent_undo')
+            set undofile                " So is persistent undo ...
+            set undolevels=1000         " Maximum number of changes that can be undone
+            set undoreload=10000        " Maximum number lines to save for undo on a buffer reload
+        endif
+
+        " Add exclusions to mkview and loadview
+        " eg: *.*, svn-commit.tmp
+        let g:skipview_files = [
+            \ '\[example pattern\]'
+            \ ]
+    " }
+" }
+
+" Functions {
+
+    " Initialize directories {
+        function! InitializeDirectories()
+            let parent = $HOME
+            let prefix = 'vim'
+            let dir_list = {
+                        \ 'backup': 'backupdir',
+                        \ 'views': 'viewdir',
+                        \ 'swap': 'directory' }
+
+            if has('persistent_undo')
+                let dir_list['undo'] = 'undodir'
+            endif
+
+            " To specify a different directory in which to place the vimbackup,
+            " vimviews, vimundo, and vimswap files/directories
+            let common_dir = parent . '/.' . prefix
+            for [dirname, settingname] in items(dir_list)
+                let directory = common_dir . dirname . '/'
+                if exists("*mkdir")
+                    if !isdirectory(directory)
+                        call mkdir(directory)
+                    endif
+                endif
+                if !isdirectory(directory)
+                    echo "Warning: Unable to create backup directory: " . directory
+                    echo "Try: mkdir -p " . directory
+                else
+                    let directory = substitute(directory, " ", "\\\\ ", "g")
+                    exec "set " . settingname . "=" . directory
+                endif
+            endfor
+        endfunction
+        call InitializeDirectories()
+    " }
+
+    " Initialize NERDTree as needed {
+        function! NERDTreeInitAsNeeded()
+            redir => bufoutput
+            buffers!
+            redir END
+            let idx = stridx(bufoutput, "NERD_tree")
+            if idx > -1
+                NERDTreeMirror
+                NERDTreeFind
+                wincmd l
+            endif
+        endfunction
+    " }
+
+    " Strip whitespace {
+        function! StripTrailingWhitespace()
+            " Preparation: save last search, and cursor position.
+            let _s=@/
+            let l = line(".")
+            let c = col(".")
+            " do the business:
+            %s/\s\+$//e
+            " clean up: restore previous search history, and cursor position
+            let @/=_s
+            call cursor(l, c)
+        endfunction
+    " }
+" }
+
+" Plugins {
+    " TextObj Sentence {
+        augroup textobj_sentence
+            autocmd!
+            autocmd FileType markdown call textobj#sentence#init()
+            autocmd FileType textile call textobj#sentence#init()
+            autocmd FileType text call textobj#sentence#init()
+        augroup END
+    " }
+
+    " TextObj Quote {
+        augroup textobj_quote
+            autocmd!
+            autocmd FileType markdown call textobj#quote#init()
+            autocmd FileType textile call textobj#quote#init()
+            autocmd FileType text call textobj#quote#init({'educate': 0})
+        augroup END
+    " }
+
+    " Ctags {
+        set tags=./tags;/,~/.vimtags
+
+        " Make tags placed in .git/tags file available in all levels of a repository
+        let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
+        if gitroot != ''
+            let &tags = &tags . ',' . gitroot . '/.git/tags'
+        endif
+    " }
+
+    " NerdTree {
+        if isdirectory(expand("~/.vim/plugged/nerdtree"))
+            map <C-e> <plug>NERDTreeTabsToggle<CR>
+            map <leader>e :NERDTreeFind<CR>
+            nmap <leader>nt :NERDTreeFind<CR>
+
+            let NERDTreeShowBookmarks=1
+            let NERDTreeIgnore=['\.py[cd]$', '\~$', '\.swo$', '\.swp$', '^\.git$', '^\.hg$', '^\.svn$', '\.bzr$']
+            let NERDTreeChDirMode=0
+            let NERDTreeQuitOnOpen=1
+            let NERDTreeMouseMode=2
+            let NERDTreeShowHidden=1
+            let NERDTreeKeepTreeInNewTab=1
+            let g:nerdtree_tabs_open_on_gui_startup=0
+        endif
+    " }
+    " Tabularize {
+        if isdirectory(expand("~/.vim/plugged/tabular"))
+            nmap <Leader>a& :Tabularize /&<CR>
+            vmap <Leader>a& :Tabularize /&<CR>
+            nmap <Leader>a= :Tabularize /^[^=]*\zs=<CR>
+            vmap <Leader>a= :Tabularize /^[^=]*\zs=<CR>
+            nmap <Leader>a=> :Tabularize /=><CR>
+            vmap <Leader>a=> :Tabularize /=><CR>
+            nmap <Leader>a: :Tabularize /:<CR>
+            vmap <Leader>a: :Tabularize /:<CR>
+            nmap <Leader>a:: :Tabularize /:\zs<CR>
+            vmap <Leader>a:: :Tabularize /:\zs<CR>
+            nmap <Leader>a, :Tabularize /,<CR>
+            vmap <Leader>a, :Tabularize /,<CR>
+            nmap <Leader>a,, :Tabularize /,\zs<CR>
+            vmap <Leader>a,, :Tabularize /,\zs<CR>
+            nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+            vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+        endif
+    " }
+" }
