@@ -31,15 +31,24 @@
     Plug 'flazz/vim-colorschemes'
     " Programming
     Plug 'godlygeek/tabular'
+    Plug 'c9s/simple-commenter.vim'
+    " Python
+    Plug 'davidhalter/jedi-vim'
     " Writing
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
     Plug 'reedes/vim-textobj-sentence'
     Plug 'reedes/vim-textobj-quote'
     Plug 'reedes/vim-litecorrect'
+    Plug 'dm4/vim-writer'
     " NerdTree
     Plug 'scrooloose/nerdtree'
     Plug 'jistr/vim-nerdtree-tabs'
+    " Tag
+    Plug 'majutsushi/tagbar'
+    " Airline
+    Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
     call plug#end()
 " }
 
@@ -126,7 +135,6 @@
     set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic whitespace
 " }
 
-
 " Formatting {
     set nowrap                      " Do not wrap long lines
     set autoindent                  " Indent at the same level of the previous line
@@ -201,7 +209,6 @@
     " Easier formatting
     nnoremap <silent> <leader>q gwip
 " }
-
 
 " Misc {
     " Clipboard {
@@ -364,6 +371,7 @@
             let g:nerdtree_tabs_open_on_gui_startup=0
         endif
     " }
+
     " Tabularize {
         if isdirectory(expand("~/.vim/plugged/tabular"))
             nmap <Leader>a& :Tabularize /&<CR>
@@ -383,5 +391,61 @@
             nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
             vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
         endif
+    " }
+
+    " TagBar {
+        if isdirectory(expand("~/.vim/plugged/tagbar/"))
+            nnoremap <silent> <leader>tt :TagbarToggle<CR>
+        endif
+    "}
+
+    " Fugitive {
+        if isdirectory(expand("~/.vim/plugged/vim-fugitive/"))
+            nnoremap <silent> <leader>gs :Gstatus<CR>
+            nnoremap <silent> <leader>gd :Gdiff<CR>
+            nnoremap <silent> <leader>gc :Gcommit<CR>
+            nnoremap <silent> <leader>gb :Gblame<CR>
+            nnoremap <silent> <leader>gl :Glog<CR>
+            nnoremap <silent> <leader>gp :Git push<CR>
+            nnoremap <silent> <leader>gr :Gread<CR>
+            nnoremap <silent> <leader>gw :Gwrite<CR>
+            nnoremap <silent> <leader>ge :Gedit<CR>
+            " Mnemonic _i_nteractive
+            nnoremap <silent> <leader>gi :Git add -p %<CR>
+            nnoremap <silent> <leader>gg :SignifyToggle<CR>
+        endif
+    "}
+
+    " vim-airline {
+        " Set configuration options for the statusline plugin vim-airline.
+        " Use the powerline theme and optionally enable powerline symbols.
+        " To use the symbols , , , , , , and .in the statusline
+        " segments add the following to your .vimrc.before.local file:
+        "   let g:airline_powerline_fonts=1
+        " If the previous symbols do not render for you then install a
+        " powerline enabled font.
+
+        " See `:echo g:airline_theme_map` for some more choices
+        " Default in terminal vim is 'dark'
+        if isdirectory(expand("~/.vim/plugged/vim-airline/"))
+            if !exists('g:airline_theme')
+                let g:airline_theme = 'solarized'
+            endif
+            if !exists('g:airline_powerline_fonts')
+                " Use the default set of separators with a few customizations
+                let g:airline_left_sep='›'  " Slightly fancier than '>'
+                let g:airline_right_sep='‹' " Slightly fancier than '<'
+            endif
+        endif
+    " }
+
+    " Simple comments {
+        map <silent> <leader>cc <Plug>(do-comment)
+        map <silent> <leader>cu <Plug>(un-comment)
+        map <silent> <leader>co <Plug>(one-line-comment)
+    " }
+
+    " vim-writer {
+        autocmd BufReadPost,BufNewFile *.md set filetype=markdown
     " }
 " }
