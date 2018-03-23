@@ -1,0 +1,17 @@
+- defaults:
+    link:
+      relink: true
+      create: true
+
+- clean: ['~']
+
+- link:
+    ~/.gitconfig:
+    ~/.tmux.conf:
+    ~/.vim:
+    ~/.vimrc:
+
+- shell:
+  -
+    command: vim +PlugInstall +qall
+    stdout: true
