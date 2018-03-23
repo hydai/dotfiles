@@ -25,6 +25,10 @@
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
+    Plug 'sjl/gundo.vim'
+    Plug 'junegunn/vim-easy-align'
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
     " Color
     Plug 'altercation/vim-colors-solarized'
     Plug 'spf13/vim-colors'
@@ -34,6 +38,10 @@
     Plug 'c9s/simple-commenter.vim'
     " Python
     Plug 'davidhalter/jedi-vim'
+    " Golang
+    Plug 'fatih/vim-go'
+    " JSON
+    Plug 'elzr/vim-json'
     " Writing
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
@@ -146,7 +154,7 @@
     set splitright                  " Puts new vsplit windows to the right of the current
     set splitbelow                  " Puts new split windows to the bottom of the current
     "set matchpairs+=<:>             " Match, to be used with %
-    set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
+    set pastetoggle=,p           " pastetoggle (sane indentation on pastes)
     "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
     " Remove trailing whitespaces and ^M chars
     autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> if call StripTrailingWhitespace() | endif
@@ -188,7 +196,7 @@
     nmap <silent> <leader>/ :set invhlsearch<CR>
 
     " Find merge conflict markers
-    map <leader>fc /\v^[<\|=>]{7}( .*\|$)<CR>
+    map <leader>fc /\v^[<\|=>]( .*\|$)<CR>
 
     " Shortcuts
     " Change Working Directory to that of the current file
@@ -397,7 +405,7 @@
         if isdirectory(expand("~/.vim/plugged/tagbar/"))
             nnoremap <silent> <leader>tt :TagbarToggle<CR>
         endif
-    "}
+    " }
 
     " Fugitive {
         if isdirectory(expand("~/.vim/plugged/vim-fugitive/"))
@@ -414,7 +422,7 @@
             nnoremap <silent> <leader>gi :Git add -p %<CR>
             nnoremap <silent> <leader>gg :SignifyToggle<CR>
         endif
-    "}
+    " }
 
     " vim-airline {
         " Set configuration options for the statusline plugin vim-airline.
@@ -447,5 +455,21 @@
 
     " vim-writer {
         autocmd BufReadPost,BufNewFile *.md set filetype=markdown
+    " }
+
+    " Gundo {
+        nmap <leader>gun :GundoToggle<CR>
+    " }
+
+    " Easy align {
+        " Start interactive EasyAlign in visual mode (e.g. vipga)
+        xmap ga <Plug>(EasyAlign)
+
+        " Start interactive EasyAlign for a motion/text object (e.g. gaip)
+        nmap ga <Plug>(EasyAlign)
+    " }
+
+    " fsf {
+        map <leader>fzf :FZF<CR>
     " }
 " }
