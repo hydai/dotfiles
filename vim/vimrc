@@ -42,6 +42,8 @@
     Plug 'fatih/vim-go'
     " JSON
     Plug 'elzr/vim-json'
+    " Solidity
+    Plug 'tomlion/vim-solidity'
     " Writing
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
@@ -157,7 +159,7 @@
     set pastetoggle=,p           " pastetoggle (sane indentation on pastes)
     "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
     " Remove trailing whitespaces and ^M chars
-    autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> if call StripTrailingWhitespace() | endif
+    autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> call StripTrailingWhitespace()
     autocmd Filetype javascript setlocal ts=2 sts=0 sw=2
     "autocmd FileType go autocmd BufWritePre <buffer> Fmt
     autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
