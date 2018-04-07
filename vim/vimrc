@@ -29,6 +29,7 @@
     Plug 'junegunn/vim-easy-align'
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
+    Plug 'nathanaelkane/vim-indent-guides'
     " Color
     Plug 'altercation/vim-colors-solarized'
     Plug 'spf13/vim-colors'
@@ -160,6 +161,7 @@
     "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
     " Remove trailing whitespaces and ^M chars
     autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+    autocmd Filetype c,cpp setlocal ts=2 sts=0 sw=2
     autocmd Filetype javascript setlocal ts=2 sts=0 sw=2
     "autocmd FileType go autocmd BufWritePre <buffer> Fmt
     autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
@@ -473,5 +475,14 @@
 
     " fsf {
         map <leader>fzf :FZF<CR>
+    " }
+
+    " vim indent guides {
+        let g:indent_guides_enable_on_vim_startup = 1
+        let g:indent_guides_auto_colors = 1
+        let g:indent_guides_indent_levels = 2
+        let g:indent_guides_guide_size = 1
+        autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=black   ctermbg=3
+        autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgray ctermbg=4
     " }
 " }
