@@ -1,17 +1,33 @@
 - defaults:
-    link:
-      relink: true
-      create: true
+  link:
+    relink: true
+    create: true
 
 - clean: ['~']
 
 - link:
-    ~/.gitconfig:
-    ~/.tmux.conf:
-    ~/.vim:
-    ~/.vimrc:
+  ~/.gitconfig:
+  ~/.tmux.conf:
+    force: true
+    path: tmux/tmux.conf
+  ~/.tmux.conf.local:
+    force: true
+    path: tmux/tmux.conf.local
+  ~/.vim: vim
+  ~/.vimrc:
+    relink: true
+    path: vim/vimrc
+  ~/.zshrc:
+    force: true
+    path: oh-my-zsh/zshrc
 
 - shell:
   -
+    command: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    stdout: true
+    stderr: true
+    description: Install oh-my-zsh
+  -
     command: vim +PlugInstall +qall
     stdout: true
+    description: Install vim plugin
