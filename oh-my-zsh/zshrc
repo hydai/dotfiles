@@ -15,6 +15,8 @@ source $ZSH/oh-my-zsh.sh
 export PATH=/usr/local/bin:$PATH
 export PATH=/usr/local/sbin:$PATH
 export PATH=/opt/local/libexec:$PATH
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$PATH
 export JAVA_HOME=$(/usr/libexec/java_home)
 
 # Git
