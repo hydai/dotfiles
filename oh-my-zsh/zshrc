@@ -43,3 +43,6 @@ alias brews="brew list -1"
 
 # hot command for restarting Mac Dock
 alias missionRst="osascript -e 'quit application \"Dock\"'"
+
+# autojump
+[ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
