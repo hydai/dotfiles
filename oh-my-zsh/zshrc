@@ -36,7 +36,7 @@ alias dp="docker pull"
 alias dri="docker rmi"
 
 # ls
-alias ls="ls -G"
+alias ls="ls -G --color"
 
 # brew
 alias brews="brew list -1"
