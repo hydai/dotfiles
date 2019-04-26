@@ -35,3 +35,11 @@
                 command: vim +PlugInstall +qall
                 stdout: true
                 description: Install vim plugin
+        -
+                command: sh -c "git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
+                stdout: true
+                description: Install zsh-syntax-highlighting
+        -
+                command: sh -c "git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
+                stdout: true
+                description: Install zsh-autosuggestions
