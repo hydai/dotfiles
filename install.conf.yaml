@@ -1,33 +1,37 @@
 - defaults:
-  link:
-    relink: true
-    create: true
+        relink: true
+        create: true
 
 - clean: ['~']
 
 - link:
-  ~/.gitconfig:
-  ~/.tmux.conf:
-    force: true
-    path: tmux/tmux.conf
-  ~/.tmux.conf.local:
-    force: true
-    path: tmux/tmux.conf.local
-  ~/.vim: vim
-  ~/.vimrc:
-    relink: true
-    path: vim/vimrc
-  ~/.zshrc:
-    force: true
-    path: oh-my-zsh/zshrc
+        ~/.gitconfig:
+        ~/.tmux.conf:
+                force: true
+                path: tmux/tmux.conf
+        ~/.tmux.conf.local:
+                force: true
+                path: tmux/tmux.conf.local
+        ~/.vim:
+                force: true
+                path: vim
+        ~/.vimrc:
+                relink: true
+                path: vim/vimrc
+        ~/.oh-my-zsh/custom/themes/hydai.zsh-theme:
+                force: true
+                path: oh-my-zsh/custom/themes/hydai.zsh-theme
+        ~/.zshrc:
+                force: true
+                path: oh-my-zsh/zshrc
 
 - shell:
-  -
-    command: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-    stdout: true
-    stderr: true
-    description: Install oh-my-zsh
-  -
-    command: vim +PlugInstall +qall
-    stdout: true
-    description: Install vim plugin
+        -
+                command: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+                stdout: true
+                stderr: true
+                description: Install oh-my-zsh
+        -
+                command: vim +PlugInstall +qall
+                stdout: true
+                description: Install vim plugin
