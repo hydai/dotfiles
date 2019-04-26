@@ -12,12 +12,22 @@ plugins=(git gitignore zsh-syntax-highlighting zsh-autosuggestions)
 source $ZSH/oh-my-zsh.sh
 
 # Customize ENV PATH
-export PATH=/usr/local/bin:$PATH
-export PATH=/usr/local/sbin:$PATH
-export PATH=/opt/local/libexec:$PATH
-export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$PATH
-export JAVA_HOME=$(/usr/libexec/java_home)
+[ -d "/usr/local/bin" ] && export PATH=/usr/local/bin:$PATH || echo "Error: Directory /usr/local/bin does not exist."
+[ -d "/usr/local/sbin" ] && export PATH=/usr/local/sbin:$PATH || echo "Error: Directory /usr/local/sbin does not exist."
+
+case `uname` in
+  Darwin)
+    [ -d "/opt/local/libexec" ] && export PATH=/opt/local/libexec:$PATH || echo "Error: Directory /opt/local/libexec does not exist."
+  ;;
+  Linux)
+    # commands for Linux go here
+  ;;
+esac
+
+[ -d $HOME/go ] && export GOPATH=$HOME/go || echo "Error: No GOPATH"
+[ -d $GOPATH/bin ] && export PATH=$GOPATH/bin:$PATH || echo "Error: No GOPATH"
+
+[ -e /usr/libexec/java_home ] && export JAVA_HOME=$(/usr/libexec/java_home) || echo "Error: No JAVA_HOME"
 
 # Git
 alias gc="git cherry-pick"
@@ -38,13 +48,18 @@ alias dri="docker rmi"
 # ls
 alias ls="ls -G --color"
 
-# brew
-alias brews="brew list -1"
+case `uname` in
+  Darwin)
+    # brew
+    alias brews="brew list -1"
 
-# hot command for restarting Mac Dock
-alias missionRst="osascript -e 'quit application \"Dock\"'"
+    # hot command for restarting Mac Dock
+    alias missionRst="osascript -e 'quit application \"Dock\"'"
+  ;;
+esac
 
 # autojump
 [ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
 
+# fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
