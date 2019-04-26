@@ -46,3 +46,5 @@ alias missionRst="osascript -e 'quit application \"Dock\"'"
 
 # autojump
 [ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
