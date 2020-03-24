@@ -37,10 +37,12 @@
     " Programming
     Plug 'godlygeek/tabular'
     Plug 'c9s/simple-commenter.vim'
+    Plug 'rhysd/vim-clang-format'
+    Plug 'w0rp/ale'
     " Python
     Plug 'davidhalter/jedi-vim'
     " Golang
-    Plug 'fatih/vim-go'
+    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
     " JSON
     Plug 'elzr/vim-json'
     " Solidity
@@ -161,11 +163,12 @@
     "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
     " Remove trailing whitespaces and ^M chars
     autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> call StripTrailingWhitespace()
-    autocmd Filetype c,cpp setlocal ts=2 sts=0 sw=2
+    autocmd Filetype c,cpp setlocal ts=2 sts=0 sw=2 expandtab
     autocmd Filetype javascript setlocal ts=2 sts=0 sw=2
+    autocmd Filetype yaml setlocal ts=2 sw=2 sts=2 expandtab
     "autocmd FileType go autocmd BufWritePre <buffer> Fmt
     autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
-    autocmd FileType haskell,ruby,yml setlocal expandtab shiftwidth=2 softtabstop=2
+    autocmd FileType haskell,ruby setlocal expandtab ts=2 sts=0 sw=2
     " preceding line best in a plugin but here for now.
     autocmd BufNewFile,BufRead *.coffee set filetype=coffee
     autocmd FileType haskell setlocal commentstring=--\ %s " Workaround vim-commentary for Haskell
@@ -376,6 +379,20 @@
         if gitroot != ''
             let &tags = &tags . ',' . gitroot . '/.git/tags'
         endif
+    " }
+
+    " Clang-format {
+        let g:clang_format#style_options = {
+                    \ "AccessModifierOffset" : -4,
+                    \ "AllowShortIfStatementsOnASingleLine" : "true",
+                    \ "AlwaysBreakTemplateDeclarations" : "true",
+                    \ "Standard" : "C++17"}
+
+        " map to <Leader>cf in C++ code
+        autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
+        autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
+        " Toggle auto formatting:
+        nmap <Leader>C :ClangFormatAutoToggle<CR>
     " }
 
     " NerdTree {
