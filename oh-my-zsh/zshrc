@@ -29,6 +29,9 @@ esac
 
 [ -e /usr/libexec/java_home ] && export JAVA_HOME=$(/usr/libexec/java_home) || echo "Error: No JAVA_HOME"
 
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
 # Git
 alias gc="git cherry-pick"
 alias gb="git branch"
@@ -63,3 +66,12 @@ esac
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+source /home/ubuntu/.gvm/scripts/gvm
+
+# helper function
+export GPG_TTY=$(tty)
+
+# Alias
+alias clang=clang-8
+alias clang++=clang++-8
