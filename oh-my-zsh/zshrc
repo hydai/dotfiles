@@ -7,7 +7,7 @@ export TERM=xterm-256color zsh
 ZSH_THEME="hydai"
 
 # include plugins
-plugins=(git gitignore zsh-syntax-highlighting zsh-autosuggestions)
+plugins=(git gitignore zsh-syntax-highlighting zsh-autosuggestions docker docker-compose)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -71,3 +71,16 @@ esac
 
 # helper function
 export GPG_TTY=$(tty)
+
+# Alias
+#alias clang=clang-10
+#alias clang++=clang++-10
+#alias clang-format=clang-format-10
+#export CC=clang-10
+#export CXX=clang++-10
+#export PATH=/home/hydai/workspace/deps/wabt/build:$PATH
+#alias wasm-ld-soll="wasm-ld-9 --entry main --gc-sections --allow-undefined --export=__heap_base"
+
+#export WASMTIME_HOME="$HOME/.wasmtime"
+#export PATH="$WASMTIME_HOME/bin:$PATH"
+#export JOBS=max
