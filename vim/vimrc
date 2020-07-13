@@ -164,6 +164,7 @@
     " Remove trailing whitespaces and ^M chars
     autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> call StripTrailingWhitespace()
     autocmd Filetype c,cpp setlocal ts=2 sts=0 sw=2 expandtab
+    autocmd Filetype cmake setlocal ts=2 sts=0 sw=2 expandtab
     autocmd Filetype javascript setlocal ts=2 sts=0 sw=2
     autocmd Filetype yaml setlocal ts=2 sw=2 sts=2 expandtab
     autocmd Filetype html setlocal ts=2 sts=0 sw=2 expandtab
