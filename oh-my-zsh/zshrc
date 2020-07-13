@@ -15,22 +15,12 @@ source $ZSH/oh-my-zsh.sh
 [ -d "/usr/local/bin" ] && export PATH=/usr/local/bin:$PATH || echo "Error: Directory /usr/local/bin does not exist."
 [ -d "/usr/local/sbin" ] && export PATH=/usr/local/sbin:$PATH || echo "Error: Directory /usr/local/sbin does not exist."
 
-case `uname` in
-  Darwin)
-    [ -d "/opt/local/libexec" ] && export PATH=/opt/local/libexec:$PATH || echo "Error: Directory /opt/local/libexec does not exist."
-  ;;
-  Linux)
-    # commands for Linux go here
-  ;;
-esac
-
 [ -d $HOME/go ] && export GOPATH=$HOME/go || echo "Error: No GOPATH"
 [ -d $GOPATH/bin ] && export PATH=$GOPATH/bin:$PATH || echo "Error: No GOPATH"
 
 [ -e /usr/libexec/java_home ] && export JAVA_HOME=$(/usr/libexec/java_home) || echo "Error: No JAVA_HOME"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# export LLVM_DIR=/usr/local/Cellar/llvm/9.0.1/lib/cmake/llvm
 
 # Git
 alias gc="git cherry-pick"
@@ -48,16 +38,25 @@ alias ds="docker start"
 alias dp="docker pull"
 alias dri="docker rmi"
 
-# ls
-alias ls="ls -G --color"
-
 case `uname` in
+  Linux)
+    # nvm
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  ;;
   Darwin)
     # brew
     alias brews="brew list -1"
 
     # hot command for restarting Mac Dock
     alias missionRst="osascript -e 'quit application \"Dock\"'"
+
+    # Helper functions for Time Machine
+    alias tmopton="sudo sysctl debug.lowpri_throttle_enabled=0"
+    alias tmoptoff="sudo sysctl debug.lowpri_throttle_enabled=1"
+
+    # nvm
+    source $(brew --prefix nvm)/nvm.sh
   ;;
 esac
 
@@ -67,11 +66,8 @@ esac
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-source /home/ubuntu/.gvm/scripts/gvm
+# gvm
+[ -f $HOME/.gvm/scripts/gvm ] && source $HOME/.gvm/scripts/gvm
 
 # helper function
 export GPG_TTY=$(tty)
-
-# Alias
-alias clang=clang-8
-alias clang++=clang++-8
