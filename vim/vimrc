@@ -54,6 +54,7 @@
     Plug 'reedes/vim-textobj-quote'
     Plug 'reedes/vim-litecorrect'
     Plug 'dm4/vim-writer'
+    Plug 'junegunn/vim-easy-align'
     " NerdTree
     Plug 'scrooloose/nerdtree'
     Plug 'jistr/vim-nerdtree-tabs'
@@ -204,6 +205,10 @@
 
     " Toggle search highlighting
     nmap <silent> <leader>/ :set invhlsearch<CR>
+
+    " Tab prev/next
+    nmap <silent> <leader>h :tabprev<CR>
+    nmap <silent> <leader>l :tabnext<CR>
 
     " Find merge conflict markers
     map <leader>fc /\v^[<\|=>]( .*\|$)<CR>
@@ -368,7 +373,6 @@
     " TextObj Quote {
         augroup textobj_quote
             autocmd!
-            autocmd FileType markdown call textobj#quote#init()
             autocmd FileType textile call textobj#quote#init()
             autocmd FileType text call textobj#quote#init({'educate': 0})
         augroup END
@@ -515,5 +519,9 @@
         let g:indent_guides_guide_size = 1
         autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=black   ctermbg=3
         autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgray ctermbg=4
+    " }
+
+    " Align GitHub-flavored Markdown tables {
+        au FileType markdown vmap <Leader><Bslash> :EasyAlign*<Bar><Enter>
     " }
 " }
