@@ -69,10 +69,18 @@ esac
 # gvm
 [ -f $HOME/.gvm/scripts/gvm ] && source $HOME/.gvm/scripts/gvm
 
+# cargo
+[ -f $HOME/.cargo/env ] && source $HOME/.cargo/env
+
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
 # helper function
 export GPG_TTY=$(tty)
 
 # Alias
+#alias wasm-ld=wasm-ld-10
 #alias clang=clang-10
 #alias clang++=clang++-10
 #alias clang-format=clang-format-10
@@ -81,6 +89,14 @@ export GPG_TTY=$(tty)
 #export PATH=/home/hydai/workspace/deps/wabt/build:$PATH
 #alias wasm-ld-soll="wasm-ld-9 --entry main --gc-sections --allow-undefined --export=__heap_base"
 
-#export WASMTIME_HOME="$HOME/.wasmtime"
-#export PATH="$WASMTIME_HOME/bin:$PATH"
-#export JOBS=max
+export WASMTIME_HOME="$HOME/.wasmtime"
+export PATH="$WASMTIME_HOME/bin:$PATH"
+export JOBS=max
+
+# Wasmer
+export WASMER_DIR="/home/hydai/.wasmer"
+[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
+export SSVM_AOT_BIN_DIR="/home/hydai/workspace/ssvm/build/tools/ssvmc"
+export SSVM_INT_BIN_DIR="/home/hydai/workspace/ssvm/build/tools/ssvm"
+[ -d "$SSVM_AOT_BIN_DIR" ] && export PATH=$SSVM_AOT_BIN_DIR:$PATH || echo "Error: No SSVM-AOT"
+[ -d "$SSVM_INT_BIN_DIR" ] && export PATH=$SSVM_INT_BIN_DIR:$PATH || echo "Error: No SSVM-INT"
