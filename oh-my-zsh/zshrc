@@ -7,7 +7,8 @@ export TERM=xterm-256color zsh
 ZSH_THEME="hydai"
 
 # include plugins
-plugins=(git gitignore zsh-syntax-highlighting zsh-autosuggestions docker docker-compose)
+plugins=(git gitignore zsh-syntax-highlighting docker docker-compose)
+#plugins=(git gitignore zsh-syntax-highlighting zsh-autosuggestions docker docker-compose)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -37,6 +38,13 @@ alias dr="docker rm"
 alias ds="docker start"
 alias dp="docker pull"
 alias dri="docker rmi"
+
+# crictl
+alias cpa="sudo crictl ps -a"
+alias ci="sudo crictl images"
+alias cr="sudo crictl rm"
+alias cs="sudo crictl start"
+alias cl="sudo crictl logs"
 
 case `uname` in
   Linux)
