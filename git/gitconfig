@@ -1,0 +1,16 @@
+[user]
+        name = hydai
+        email = hydai@secondstate.io
+        signingkey = 5C8CFB7C13E97A078A7CD054CE695004C6390E87
+[commit]
+        gpgsign = true
+[alias]
+        cis = commit -S
+[gpg]
+        program = gpg
+[core]
+        editor = vim
+[diff]
+        tool = vimdiff
+[merge]
+        tool = vimdiff

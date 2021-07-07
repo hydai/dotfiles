@@ -6,6 +6,8 @@
 
 - link:
         ~/.gitconfig:
+                force: true
+                path: git/gitconfig
         ~/.tmux.conf:
                 force: true
                 path: tmux/tmux.conf
