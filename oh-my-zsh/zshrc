@@ -6,22 +6,30 @@ export TERM=xterm-256color zsh
 # theme name
 ZSH_THEME="hydai"
 
+# Detect OS
+if [[ $(uname) == "Darwin" ]]; then
+	echo ""
+elif command -v freebsd-version > /dev/null; then
+    source "$ZSH_CUSTOM"/os/freebsd.zsh
+elif command -v apt > /dev/null; then
+    source "$ZSH_CUSTOM"/os/debian.zsh
+else
+    echo 'Unknown OS!'
+fi
+
 # include plugins
-plugins=(git gitignore zsh-syntax-highlighting docker docker-compose)
-#plugins=(git gitignore zsh-syntax-highlighting zsh-autosuggestions docker docker-compose)
+plugins=(git gitignore zsh-syntax-highlighting zsh-autosuggestions docker docker-compose asdf)
 
 source $ZSH/oh-my-zsh.sh
 
 # Customize ENV PATH
-[ -d "/usr/local/bin" ] && export PATH=/usr/local/bin:$PATH || echo "Error: Directory /usr/local/bin does not exist."
-[ -d "/usr/local/sbin" ] && export PATH=/usr/local/sbin:$PATH || echo "Error: Directory /usr/local/sbin does not exist."
+[ -d "/usr/local/bin" ] && export PATH=/usr/local/bin:$PATH
+[ -d "/usr/local/sbin" ] && export PATH=/usr/local/sbin:$PATH
 
-[ -d $HOME/go ] && export GOPATH=$HOME/go || echo "Error: No GOPATH"
-[ -d $GOPATH/bin ] && export PATH=$GOPATH/bin:$PATH || echo "Error: No GOPATH"
+[ -d $HOME/go ] && export GOPATH=$HOME/go
+[ -d $GOPATH/bin ] && export PATH=$GOPATH/bin:$PATH
 
 [ -e /usr/libexec/java_home ] && export JAVA_HOME=$(/usr/libexec/java_home) || echo "Error: No JAVA_HOME"
-
-# export LLVM_DIR=/usr/local/Cellar/llvm/9.0.1/lib/cmake/llvm
 
 # Git
 alias gc="git cherry-pick"
@@ -54,6 +62,7 @@ case `uname` in
   ;;
   Darwin)
     # brew
+    eval "$(/opt/homebrew/bin/brew shellenv)"
     alias brews="brew list -1"
 
     # hot command for restarting Mac Dock
@@ -74,9 +83,6 @@ esac
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# gvm
-[ -f $HOME/.gvm/scripts/gvm ] && source $HOME/.gvm/scripts/gvm
-
 # cargo
 [ -f $HOME/.cargo/env ] && source $HOME/.cargo/env
 
@@ -88,23 +94,21 @@ export NVM_DIR="$HOME/.nvm"
 export GPG_TTY=$(tty)
 
 # Alias
-#alias wasm-ld=wasm-ld-10
-#alias clang=clang-10
-#alias clang++=clang++-10
-#alias clang-format=clang-format-10
-#export CC=clang-10
-#export CXX=clang++-10
-#export PATH=/home/hydai/workspace/deps/wabt/build:$PATH
+#alias wasm-ld=wasm-ld-15
+#alias clang=clang-15
+#alias clang++=clang++-15
+#alias clang-format=clang-format-15
+#export CC=clang-15
+#export CXX=clang++-15
 #alias wasm-ld-soll="wasm-ld-9 --entry main --gc-sections --allow-undefined --export=__heap_base"
 
 export WASMTIME_HOME="$HOME/.wasmtime"
 export PATH="$WASMTIME_HOME/bin:$PATH"
+export PATH="/Users/hydai/.local/bin:$PATH"
 export JOBS=max
 
-# Wasmer
-export WASMER_DIR="/home/hydai/.wasmer"
-[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
-export SSVM_AOT_BIN_DIR="/home/hydai/workspace/ssvm/build/tools/ssvmc"
-export SSVM_INT_BIN_DIR="/home/hydai/workspace/ssvm/build/tools/ssvm"
-[ -d "$SSVM_AOT_BIN_DIR" ] && export PATH=$SSVM_AOT_BIN_DIR:$PATH || echo "Error: No SSVM-AOT"
-[ -d "$SSVM_INT_BIN_DIR" ] && export PATH=$SSVM_INT_BIN_DIR:$PATH || echo "Error: No SSVM-INT"
+export PATH="$(brew --prefix)/opt/openjdk@11/bin:$PATH"
+export PATH="$(brew --prefix)/opt/llvm@16/bin:$PATH"
+export LLVM_DIR="$(brew --prefix)/opt/llvm@17/lib/cmake"
+. $(brew --prefix asdf)/libexec/asdf.sh
+source "/Users/hydai/.wasmedge/env"

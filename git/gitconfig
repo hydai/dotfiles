@@ -1,16 +1,42 @@
 [user]
-        name = hydai
-        email = hydai@secondstate.io
-        signingkey = 5C8CFB7C13E97A078A7CD054CE695004C6390E87
+	name = hydai
+	email = z54981220@gmail.com
+	signingkey = 762E65A24EBA8883E1145F2AE324E8673FAE3F77
 [commit]
-        gpgsign = true
+	gpgsign = true
 [alias]
-        cis = commit -S
+	cis = commit -S
 [gpg]
-        program = gpg
+	program = gpg
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[init]
+	defaultBranch = master
+
 [core]
-        editor = vim
-[diff]
-        tool = vimdiff
+	pager = delta
+
 [merge]
-        tool = vimdiff
+	conflictstyle = diff3
+
+[interactive]
+	diffFilter = delta --color-only --features=interactive
+
+[delta]
+	features = decorations
+	line-numbers = true
+
+[delta "interactive"]
+	keep-plus-minus-markers = false
+
+[delta "decorations"]
+	commit-decoration-style = blue ol
+	commit-style = raw
+	file-style = omit
+	hunk-header-decoration-style = blue box
+	hunk-header-file-style = red
+	hunk-header-line-number-style = "#067a00"
+	hunk-header-style = file line-number syntax
