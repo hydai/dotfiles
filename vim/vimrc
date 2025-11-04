@@ -10,7 +10,6 @@
     " Basics {
         set nocompatible            " Must be first line.
         set background=dark         " Set dark background.
-        "set shell=/usr/bin/env zsh  " Set zsh as default shell
         scriptencoding utf-8        " Set utf-8 as default encoding
     " }
 
@@ -54,7 +53,6 @@
     Plug 'reedes/vim-textobj-quote'
     Plug 'reedes/vim-litecorrect'
     Plug 'dm4/vim-writer'
-    Plug 'junegunn/vim-easy-align'
     " NerdTree
     Plug 'scrooloose/nerdtree'
     Plug 'jistr/vim-nerdtree-tabs'
@@ -109,7 +107,6 @@
 
     highlight clear SignColumn      " SignColumn should match background
     highlight clear LineNr          " Current line number row will have same background color in relative mode
-    "highlight clear CursorLineNr    " Remove highlight color from current line number
 
     if has('cmdline_info')
         set ruler                   " Show the ruler
@@ -118,13 +115,14 @@
         " Selected characters/lines in visual mode
     endif
 
-    if has('statusline')
+    " Custom statusline (only used if vim-airline is not available)
+    if has('statusline') && !isdirectory(expand("~/.vim/plugged/vim-airline/"))
         set laststatus=2
 
         " Broken down into easily includeable segments
         set statusline=%<%f\                     " Filename
         set statusline+=%w%h%m%r                 " Options
-        if !exists('g:override_spf13_bundles')
+        if isdirectory(expand("~/.vim/plugged/vim-fugitive/"))
             set statusline+=%{fugitive#statusline()} " Git Hotness
         endif
         set statusline+=\ [%{&ff}/%Y]            " Filetype
@@ -155,30 +153,32 @@
     set nowrap                      " Do not wrap long lines
     set autoindent                  " Indent at the same level of the previous line
     set shiftwidth=4                " Use indents of 4 spaces
-    "set expandtab                   " Tabs are spaces, not tabs
     set tabstop=4                   " An indentation every four columns
     set softtabstop=4               " Let backspace delete indent
     set nojoinspaces                " Prevents inserting two spaces after punctuation on a join (J)
     set splitright                  " Puts new vsplit windows to the right of the current
     set splitbelow                  " Puts new split windows to the bottom of the current
-    "set matchpairs+=<:>             " Match, to be used with %
     set pastetoggle=,p           " pastetoggle (sane indentation on pastes)
-    "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
-    " Remove trailing whitespaces and ^M chars
-    autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> call StripTrailingWhitespace()
-    autocmd Filetype c,cpp setlocal ts=2 sts=0 sw=2 expandtab
-    autocmd Filetype cmake setlocal ts=2 sts=0 sw=2 expandtab
-    autocmd Filetype javascript setlocal ts=2 sts=0 sw=2
-    autocmd Filetype yaml setlocal ts=2 sw=2 sts=2 expandtab
-    autocmd Filetype html setlocal ts=2 sts=0 sw=2 expandtab
-    autocmd Filetype htmldjango setlocal ts=2 sts=0 sw=2 expandtab
-    "autocmd FileType go autocmd BufWritePre <buffer> Fmt
-    autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
-    autocmd FileType haskell,ruby setlocal expandtab ts=2 sts=0 sw=2
-    " preceding line best in a plugin but here for now.
-    autocmd BufNewFile,BufRead *.coffee set filetype=coffee
-    autocmd FileType haskell setlocal commentstring=--\ %s " Workaround vim-commentary for Haskell
-    autocmd FileType haskell,rust setlocal nospell " Workaround broken colour highlighting in Haskell
+    " Filetype-specific settings
+    augroup filetypeSettings
+        autocmd!
+        " Remove trailing whitespaces and ^M chars
+        autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+        " Indentation settings
+        autocmd Filetype c,cpp setlocal ts=2 sts=0 sw=2 expandtab
+        autocmd Filetype cmake setlocal ts=2 sts=0 sw=2 expandtab
+        autocmd Filetype javascript setlocal ts=2 sts=0 sw=2
+        autocmd Filetype yaml setlocal ts=2 sw=2 sts=2 expandtab
+        autocmd Filetype html setlocal ts=2 sts=0 sw=2 expandtab
+        autocmd Filetype htmldjango setlocal ts=2 sts=0 sw=2 expandtab
+        autocmd FileType haskell,ruby setlocal expandtab ts=2 sts=0 sw=2
+        " Custom filetype detection
+        autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
+        autocmd BufNewFile,BufRead *.coffee set filetype=coffee
+        " Language-specific workarounds
+        autocmd FileType haskell setlocal commentstring=--\ %s
+        autocmd FileType haskell,rust setlocal nospell
+    augroup END
 " }
 
 " Key (re)Mappings {
@@ -194,16 +194,9 @@
     nnoremap Y y$
 
     " Code folding options
-    nmap <leader>f0 :set foldlevel=0<CR>
-    nmap <leader>f1 :set foldlevel=1<CR>
-    nmap <leader>f2 :set foldlevel=2<CR>
-    nmap <leader>f3 :set foldlevel=3<CR>
-    nmap <leader>f4 :set foldlevel=4<CR>
-    nmap <leader>f5 :set foldlevel=5<CR>
-    nmap <leader>f6 :set foldlevel=6<CR>
-    nmap <leader>f7 :set foldlevel=7<CR>
-    nmap <leader>f8 :set foldlevel=8<CR>
-    nmap <leader>f9 :set foldlevel=9<CR>
+    for i in range(0, 9)
+        execute 'nmap <leader>f' . i . ' :set foldlevel=' . i . '<CR>'
+    endfor
 
     " Toggle search highlighting
     nmap <silent> <leader>/ :set invhlsearch<CR>
@@ -247,7 +240,7 @@
     " }
 
     " Autochdir {
-        let g:no_autochdir = 1
+        " Set g:no_autochdir = 1 in your .vimrc.local to disable auto-changing directory
         if !exists('g:no_autochdir')
             autocmd BufEnter * if bufname("") !~ "^\[A-Za-z0-9\]*://" | lcd %:p:h | endif
         endif
@@ -372,25 +365,6 @@
         augroup END
     " }
 
-    " VIM-AI {
-        let g:vim_ai_chat = {
-                    \  "options": {
-                    \    "model": "gpt-4o",
-                    \    "temperature": 0.7,
-                    \  },
-                    \}
-        " Notes:
-        " ui.paste_mode
-        " - if disabled code indentation will work but AI doesn't always respond with a code block
-        "   therefore it could be messed up
-        " - find out more in vim's help `:help paste`
-        " options.max_tokens
-        " - note that prompt + max_tokens must be less than model's token limit, see #42, #46
-        " - setting max tokens to 0 will exclude it from the OpenAI API request parameters, it is
-        "   unclear/undocumented what it exactly does, but it seems to resolve issues when the model
-        "   hits token limit, which respond with `OpenAI: HTTPError 400`
-    " }
-
     " TextObj Quote {
         augroup textobj_quote
             autocmd!
@@ -406,6 +380,26 @@
         let gitroot = substitute(system('git rev-parse --show-toplevel'), '[\n\r]', '', 'g')
         if gitroot != ''
             let &tags = &tags . ',' . gitroot . '/.git/tags'
+        endif
+    " }
+
+    " ALE (Asynchronous Lint Engine) {
+        if isdirectory(expand("~/.vim/plugged/ale"))
+            " Enable linting
+            let g:ale_enabled = 1
+            " Show errors in the sign column
+            let g:ale_sign_column_always = 1
+            " Configure error/warning signs
+            let g:ale_sign_error = '✗'
+            let g:ale_sign_warning = '⚠'
+            " Navigate between errors
+            nmap <silent> [e <Plug>(ale_previous_wrap)
+            nmap <silent> ]e <Plug>(ale_next_wrap)
+            " Customize which linters to use per filetype
+            " let g:ale_linters = {
+            " \   'python': ['flake8', 'pylint'],
+            " \   'javascript': ['eslint'],
+            " \}
         endif
     " }
 
@@ -442,22 +436,20 @@
 
     " Tabularize {
         if isdirectory(expand("~/.vim/plugged/tabular"))
-            nmap <Leader>a& :Tabularize /&<CR>
-            vmap <Leader>a& :Tabularize /&<CR>
-            nmap <Leader>a= :Tabularize /^[^=]*\zs=<CR>
-            vmap <Leader>a= :Tabularize /^[^=]*\zs=<CR>
-            nmap <Leader>a=> :Tabularize /=><CR>
-            vmap <Leader>a=> :Tabularize /=><CR>
-            nmap <Leader>a: :Tabularize /:<CR>
-            vmap <Leader>a: :Tabularize /:<CR>
-            nmap <Leader>a:: :Tabularize /:\zs<CR>
-            vmap <Leader>a:: :Tabularize /:\zs<CR>
-            nmap <Leader>a, :Tabularize /,<CR>
-            vmap <Leader>a, :Tabularize /,<CR>
-            nmap <Leader>a,, :Tabularize /,\zs<CR>
-            vmap <Leader>a,, :Tabularize /,\zs<CR>
-            nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
-            vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+            let s:tabularize_patterns = {
+                \ '&': '/&',
+                \ '=': '/^[^=]*\zs=',
+                \ '=>': '/=>',
+                \ ':': '/:',
+                \ '::': '/:\zs',
+                \ ',': '/,',
+                \ ',,': '/,\zs',
+                \ '<Bar>': '/<Bar>'
+                \ }
+            for [key, pattern] in items(s:tabularize_patterns)
+                execute 'nmap <Leader>a' . key . ' :Tabularize ' . pattern . '<CR>'
+                execute 'vmap <Leader>a' . key . ' :Tabularize ' . pattern . '<CR>'
+            endfor
         endif
     " }
 
@@ -469,18 +461,17 @@
 
     " Fugitive {
         if isdirectory(expand("~/.vim/plugged/vim-fugitive/"))
-            nnoremap <silent> <leader>gs :Gstatus<CR>
-            nnoremap <silent> <leader>gd :Gdiff<CR>
-            nnoremap <silent> <leader>gc :Gcommit<CR>
-            nnoremap <silent> <leader>gb :Gblame<CR>
-            nnoremap <silent> <leader>gl :Glog<CR>
+            nnoremap <silent> <leader>gs :Git<CR>
+            nnoremap <silent> <leader>gd :Gvdiffsplit<CR>
+            nnoremap <silent> <leader>gc :Git commit<CR>
+            nnoremap <silent> <leader>gb :Git blame<CR>
+            nnoremap <silent> <leader>gl :Git log<CR>
             nnoremap <silent> <leader>gp :Git push<CR>
             nnoremap <silent> <leader>gr :Gread<CR>
             nnoremap <silent> <leader>gw :Gwrite<CR>
             nnoremap <silent> <leader>ge :Gedit<CR>
             " Mnemonic _i_nteractive
             nnoremap <silent> <leader>gi :Git add -p %<CR>
-            nnoremap <silent> <leader>gg :SignifyToggle<CR>
         endif
     " }
 
