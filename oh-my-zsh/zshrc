@@ -6,15 +6,11 @@ export TERM=xterm-256color zsh
 # theme name
 ZSH_THEME="hydai"
 
-# Detect OS
-if [[ $(uname) == "Darwin" ]]; then
-	echo ""
-elif command -v freebsd-version > /dev/null; then
-    source "$ZSH_CUSTOM"/os/freebsd.zsh
-elif command -v apt > /dev/null; then
-    source "$ZSH_CUSTOM"/os/debian.zsh
-else
-    echo 'Unknown OS!'
+# Detect OS and load OS-specific configuration
+if command -v freebsd-version > /dev/null 2>&1; then
+    [ -f "$ZSH_CUSTOM/os/freebsd.zsh" ] && source "$ZSH_CUSTOM/os/freebsd.zsh"
+elif command -v apt > /dev/null 2>&1 && [[ $(uname) != "Darwin" ]]; then
+    [ -f "$ZSH_CUSTOM/os/debian.zsh" ] && source "$ZSH_CUSTOM/os/debian.zsh"
 fi
 
 # include plugins
@@ -62,8 +58,15 @@ case `uname` in
   ;;
   Darwin)
     # brew
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    alias brews="brew list -1"
+    if command -v brew > /dev/null; then
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+      alias brews="brew list -1"
+
+      # nvm
+      if [ -d "$(brew --prefix nvm 2>/dev/null)" ]; then
+        source $(brew --prefix nvm)/nvm.sh
+      fi
+    fi
 
     # hot command for restarting Mac Dock
     alias missionRst="osascript -e 'quit application \"Dock\"'"
@@ -71,9 +74,6 @@ case `uname` in
     # Helper functions for Time Machine
     alias tmopton="sudo sysctl debug.lowpri_throttle_enabled=0"
     alias tmoptoff="sudo sysctl debug.lowpri_throttle_enabled=1"
-
-    # nvm
-    source $(brew --prefix nvm)/nvm.sh
   ;;
 esac
 
@@ -85,10 +85,6 @@ esac
 
 # cargo
 [ -f $HOME/.cargo/env ] && source $HOME/.cargo/env
-
-# nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 # helper function
 export GPG_TTY=$(tty)
@@ -104,11 +100,14 @@ export GPG_TTY=$(tty)
 
 export WASMTIME_HOME="$HOME/.wasmtime"
 export PATH="$WASMTIME_HOME/bin:$PATH"
-export PATH="/Users/hydai/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export JOBS=max
 
-export PATH="$(brew --prefix)/opt/openjdk@11/bin:$PATH"
-export PATH="$(brew --prefix)/opt/llvm@16/bin:$PATH"
-export LLVM_DIR="$(brew --prefix)/opt/llvm@17/lib/cmake"
-. $(brew --prefix asdf)/libexec/asdf.sh
-source "/Users/hydai/.wasmedge/env"
+# Homebrew-based tools (only if brew is available)
+if command -v brew > /dev/null; then
+  export PATH="$(brew --prefix)/opt/openjdk@11/bin:$PATH"
+  export PATH="$(brew --prefix)/opt/llvm@16/bin:$PATH"
+  export LLVM_DIR="$(brew --prefix)/opt/llvm@17/lib/cmake"
+  [ -f "$(brew --prefix asdf)/libexec/asdf.sh" ] && . $(brew --prefix asdf)/libexec/asdf.sh
+fi
+[ -f "$HOME/.wasmedge/env" ] && source "$HOME/.wasmedge/env"
