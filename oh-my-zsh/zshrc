@@ -1,35 +1,74 @@
 # oh-my-zsh path
 ZSH=$HOME/.oh-my-zsh
-
-export TERM=xterm-256color zsh
-
-# theme name
+ZSH_CUSTOM=${ZSH_CUSTOM:-$ZSH/custom}
 ZSH_THEME="hydai"
 
-# Detect OS
-if [[ $(uname) == "Darwin" ]]; then
-	echo ""
-elif command -v freebsd-version > /dev/null; then
-    source "$ZSH_CUSTOM"/os/freebsd.zsh
-elif command -v apt > /dev/null; then
-    source "$ZSH_CUSTOM"/os/debian.zsh
-else
+export TERM=xterm-256color
+
+OS_NAME="$(uname -s)"
+
+# Helper functions
+source_if_exists() {
+  local file="$1"
+  [[ -f "$file" ]] && source "$file"
+}
+
+prepend_path() {
+  local dir="$1"
+  [[ -d "$dir" ]] || return
+  PATH="$dir:$PATH"
+}
+
+# Load OS-specific overrides
+case "$OS_NAME" in
+  Darwin)
+    source_if_exists "$ZSH_CUSTOM/os/darwin.zsh"
+    ;;
+  FreeBSD)
+    source_if_exists "$ZSH_CUSTOM/os/freebsd.zsh"
+    ;;
+  Linux)
+    if command -v apt >/dev/null; then
+      source_if_exists "$ZSH_CUSTOM/os/debian.zsh"
+    fi
+    ;;
+  *)
     echo 'Unknown OS!'
+    ;;
+esac
+
+# Homebrew (if available)
+BREW_BIN=""
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  BREW_BIN=/opt/homebrew/bin/brew
+elif [[ -x /usr/local/bin/brew ]]; then
+  BREW_BIN=/usr/local/bin/brew
+elif command -v brew >/dev/null; then
+  BREW_BIN=$(command -v brew)
 fi
 
-# include plugins
+if [[ -n "$BREW_BIN" ]]; then
+  eval "$("$BREW_BIN" shellenv)"
+  BREW_PREFIX="$("$BREW_BIN" --prefix 2>/dev/null)"
+  alias brews="brew list -1"
+fi
+
+# Oh My Zsh plugins
 plugins=(git gitignore zsh-syntax-highlighting zsh-autosuggestions docker docker-compose asdf)
 
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 
-# Customize ENV PATH
-[ -d "/usr/local/bin" ] && export PATH=/usr/local/bin:$PATH
-[ -d "/usr/local/sbin" ] && export PATH=/usr/local/sbin:$PATH
+prepend_path "/usr/local/bin"
+prepend_path "/usr/local/sbin"
 
-[ -d $HOME/go ] && export GOPATH=$HOME/go
-[ -d $GOPATH/bin ] && export PATH=$GOPATH/bin:$PATH
+if [[ -d "$HOME/go" ]]; then
+  export GOPATH="${GOPATH:-$HOME/go}"
+  prepend_path "$GOPATH/bin"
+fi
 
-[ -e /usr/libexec/java_home ] && export JAVA_HOME=$(/usr/libexec/java_home) || echo "Error: No JAVA_HOME"
+if [[ "$OS_NAME" == "Darwin" ]] && [[ -x /usr/libexec/java_home ]]; then
+  export JAVA_HOME=$(/usr/libexec/java_home)
+fi
 
 # Git
 alias gc="git cherry-pick"
@@ -54,61 +93,64 @@ alias cr="sudo crictl rm"
 alias cs="sudo crictl start"
 alias cl="sudo crictl logs"
 
-case `uname` in
-  Linux)
-    # nvm
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-  ;;
-  Darwin)
-    # brew
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    alias brews="brew list -1"
+if [[ "$OS_NAME" == "Darwin" ]]; then
+  alias missionRst="osascript -e 'quit application \"Dock\"'"
+  alias tmopton="sudo sysctl debug.lowpri_throttle_enabled=0"
+  alias tmoptoff="sudo sysctl debug.lowpri_throttle_enabled=1"
+fi
 
-    # hot command for restarting Mac Dock
-    alias missionRst="osascript -e 'quit application \"Dock\"'"
+if [[ -n "$BREW_PREFIX" ]]; then
+  prepend_path "$BREW_PREFIX/opt/openjdk@11/bin"
+  prepend_path "$BREW_PREFIX/opt/llvm@16/bin"
+  if [[ -d "$BREW_PREFIX/opt/llvm@17/lib/cmake" ]]; then
+    export LLVM_DIR="$BREW_PREFIX/opt/llvm@17/lib/cmake"
+  fi
+fi
 
-    # Helper functions for Time Machine
-    alias tmopton="sudo sysctl debug.lowpri_throttle_enabled=0"
-    alias tmoptoff="sudo sysctl debug.lowpri_throttle_enabled=1"
+if [[ -n "$BREW_BIN" ]]; then
+  NVM_FROM_BREW="$("$BREW_BIN" --prefix nvm 2>/dev/null)/nvm.sh"
+fi
 
-    # nvm
-    source $(brew --prefix nvm)/nvm.sh
-  ;;
-esac
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+elif [[ -n "$NVM_FROM_BREW" ]]; then
+  source_if_exists "$NVM_FROM_BREW"
+fi
 
-# autojump
-[ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
+if [[ -n "$BREW_BIN" ]]; then
+  ASDF_PREFIX="$("$BREW_BIN" --prefix asdf 2>/dev/null)"
+  if [[ -n "$ASDF_PREFIX" ]]; then
+    source_if_exists "$ASDF_PREFIX/libexec/asdf.sh"
+    ASDF_LOADED=1
+  fi
+fi
 
-# fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [[ -z "$ASDF_LOADED" ]]; then
+  source_if_exists "$HOME/.asdf/asdf.sh"
+fi
 
-# cargo
-[ -f $HOME/.cargo/env ] && source $HOME/.cargo/env
+# Try common autojump locations so Linux and macOS work the same
+AUTOJUMP_CANDIDATES=(
+  "/usr/local/etc/profile.d/autojump.sh"
+  "${BREW_PREFIX:+$BREW_PREFIX/etc/profile.d/autojump.sh}"
+  "/usr/share/autojump/autojump.zsh"
+)
+for candidate in "${AUTOJUMP_CANDIDATES[@]}"; do
+  [[ -f "$candidate" ]] && source "$candidate" && break
+done
+unset AUTOJUMP_CANDIDATES
 
-# nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+source_if_exists "$HOME/.fzf.zsh"
+source_if_exists "$HOME/.cargo/env"
+source_if_exists "$HOME/.wasmedge/env"
 
-# helper function
 export GPG_TTY=$(tty)
 
-# Alias
-#alias wasm-ld=wasm-ld-15
-#alias clang=clang-15
-#alias clang++=clang++-15
-#alias clang-format=clang-format-15
-#export CC=clang-15
-#export CXX=clang++-15
-#alias wasm-ld-soll="wasm-ld-9 --entry main --gc-sections --allow-undefined --export=__heap_base"
-
 export WASMTIME_HOME="$HOME/.wasmtime"
-export PATH="$WASMTIME_HOME/bin:$PATH"
-export PATH="/Users/hydai/.local/bin:$PATH"
+prepend_path "$WASMTIME_HOME/bin"
+prepend_path "$HOME/.local/bin"
+
 export JOBS=max
 
-export PATH="$(brew --prefix)/opt/openjdk@11/bin:$PATH"
-export PATH="$(brew --prefix)/opt/llvm@16/bin:$PATH"
-export LLVM_DIR="$(brew --prefix)/opt/llvm@17/lib/cmake"
-. $(brew --prefix asdf)/libexec/asdf.sh
-source "/Users/hydai/.wasmedge/env"
+unset ASDF_LOADED NVM_FROM_BREW
