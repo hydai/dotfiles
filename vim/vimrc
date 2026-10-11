@@ -33,7 +33,7 @@
     " Programming
     Plug 'c9s/simple-commenter.vim'
     Plug 'rhysd/vim-clang-format'
-    Plug 'w0rp/ale'
+    Plug 'dense-analysis/ale'
     " Python
     Plug 'davidhalter/jedi-vim'
     " Golang
@@ -44,9 +44,9 @@
     Plug 'reedes/vim-textobj-sentence'
     Plug 'reedes/vim-textobj-quote'
     " NerdTree
-    Plug 'scrooloose/nerdtree'
+    Plug 'preservim/nerdtree'
     " Tag
-    Plug 'majutsushi/tagbar'
+    Plug 'preservim/tagbar'
     " Airline
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
