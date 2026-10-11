@@ -3,9 +3,10 @@
 ## First-Time Installation Workflow
 
 - Run `./setup.sh` from a temporary checkout to bootstrap a new machine.
-- On Linux hosts the script installs required packages with `apt`; other platforms skip this step.
+- On Debian-based Linux hosts the script installs required packages with `apt-get`.
+- On macOS, install Homebrew first; the installer uses it for Universal Ctags and uv when they are missing.
 - The script clones the repository into `~/.dotfiles`, updates submodules, configures the push remote, and then executes `./install` from the new clone.
-- `install` makes sure the Dotbot submodule is present and applies the symlink/configuration rules defined in `install.conf.yaml`.
+- `install` makes sure the Dotbot submodule is present, installs Universal Ctags and Zuban, and applies the symlink/configuration rules defined in `install.conf.yaml`.
 
 Example invocation on a fresh machine:
 

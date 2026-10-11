@@ -35,9 +35,7 @@
     Plug 'rhysd/vim-clang-format'
     Plug 'dense-analysis/ale'
     " Python
-    Plug 'davidhalter/jedi-vim'
-    " Golang
-    Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+    Plug 'prabirshrestha/vim-lsp'
     " Writing
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
@@ -352,6 +350,88 @@
         nmap <Leader>C :ClangFormatAutoToggle<CR>
     " }
 
+    " Python LSP {
+        " Zuban owns Python diagnostics and language features. Keep ALE for
+        " the other file types it supports.
+        let g:ale_linters = {'python': []}
+        let g:lsp_async_completion = 1
+        let g:lsp_signature_help_enabled = 1
+        let g:lsp_signature_help_delay = 100
+
+        function! s:ZubanPythonExecutable(root) abort
+            for l:venv_dir in ['.venv', 'venv', 'env']
+                let l:python = a:root . '/' . l:venv_dir . '/bin/python'
+
+                if executable(l:python)
+                    return fnamemodify(l:python, ':p')
+                endif
+            endfor
+
+            if !empty($VIRTUAL_ENV)
+                let l:python = $VIRTUAL_ENV . '/bin/python'
+
+                if executable(l:python)
+                    return fnamemodify(l:python, ':p')
+                endif
+            endif
+
+            return ''
+        endfunction
+
+        function! s:ZubanRootUri(server_info) abort
+            let l:root = lsp#utils#find_nearest_parent_file_directory(
+                        \ lsp#utils#get_buffer_path(),
+                        \ ['pyproject.toml', 'mypy.ini', '.mypy.ini', 'setup.cfg', '.git/'])
+
+            if empty(l:root)
+                let l:root = fnamemodify(lsp#utils#get_buffer_path(), ':p:h')
+            endif
+
+            let l:python = s:ZubanPythonExecutable(l:root)
+
+            if !empty(l:python)
+                let a:server_info.initialization_options.pythonExecutable = l:python
+            endif
+
+            return lsp#utils#path_to_uri(l:root)
+        endfunction
+
+        function! s:ConfigureZubanBuffer() abort
+            if &filetype !=# 'python'
+                return
+            endif
+
+            setlocal omnifunc=lsp#complete
+            setlocal signcolumn=yes
+            setlocal completeopt=menuone,noinsert,noselect
+
+            inoremap <buffer> <silent> <C-Space> <C-x><C-o>
+            nmap <buffer> <silent> <Leader>g <Plug>(lsp-declaration)
+            nmap <buffer> <silent> <Leader>d <Plug>(lsp-definition)
+            nmap <buffer> <silent> <Leader>s <Plug>(lsp-type-definition)
+            nmap <buffer> <silent> K <Plug>(lsp-hover)
+            nmap <buffer> <silent> <Leader>r <Plug>(lsp-rename)
+            nmap <buffer> <silent> <Leader>n <Plug>(lsp-references)
+        endfunction
+
+        augroup zubanLsp
+            autocmd!
+            if executable('zuban')
+                autocmd User lsp_setup call lsp#register_server({
+                            \ 'name': 'zuban',
+                            \ 'cmd': {server_info -> ['zuban', 'server']},
+                            \ 'root_uri': function('<SID>ZubanRootUri'),
+                            \ 'allowlist': ['python'],
+                            \ 'initialization_options': {
+                            \     'typeCheckingMode': 'auto',
+                            \     'diagnosticMode': 'open-files-only',
+                            \ },
+                            \ })
+                autocmd User lsp_buffer_enabled call <SID>ConfigureZubanBuffer()
+            endif
+        augroup END
+    " }
+
     " NerdTree {
         if isdirectory(expand("~/.vim/plugged/nerdtree"))
             nnoremap <silent> <C-e> :NERDTreeToggle<CR>
@@ -401,6 +481,9 @@
 
         " See `:echo g:airline_theme_map` for some more choices
         " Default in terminal vim is 'dark'
+        " Avoid eagerly initializing Tagbar for an unnamed startup buffer.
+        let g:airline#extensions#tagbar#enabled = 0
+
         if isdirectory(expand("~/.vim/plugged/vim-airline/"))
             if !exists('g:airline_theme')
                 let g:airline_theme = 'solarized'

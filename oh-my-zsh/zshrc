@@ -61,11 +61,6 @@ source "$ZSH/oh-my-zsh.sh"
 prepend_path "/usr/local/bin"
 prepend_path "/usr/local/sbin"
 
-if [[ -d "$HOME/go" ]]; then
-  export GOPATH="${GOPATH:-$HOME/go}"
-  prepend_path "$GOPATH/bin"
-fi
-
 if [[ "$OS_NAME" == "Darwin" ]] && [[ -x /usr/libexec/java_home ]]; then
   export JAVA_HOME=$(/usr/libexec/java_home)
 fi

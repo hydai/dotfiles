@@ -29,23 +29,29 @@
 
 - shell:
         -
-                command: sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+                command: test -d "$HOME/.oh-my-zsh" || KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
                 stdout: true
                 stderr: true
                 description: Install oh-my-zsh
+        -
+                command: ./scripts/install-vim-tools.sh
+                stdout: true
+                stderr: true
+                description: Install Vim command-line dependencies
         -
                 command: vim -Nu NONE -n -es -i NONE +"silent mkspell! vim/spell/en.utf-8.add" +qall
                 stderr: true
                 description: Compile Vim spell additions
         -
-                command: vim +PlugInstall +qall
+                command: vim -Nu "$HOME/.vimrc" -n -es -i NONE +PlugInstall +qall
                 stdout: true
-                description: Install vim plugin
+                stderr: true
+                description: Install Vim plugins
         -
-                command: sh -c "git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
+                command: test -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" || git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
                 stdout: true
                 description: Install zsh-syntax-highlighting
         -
-                command: sh -c "git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
+                command: test -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" || git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
                 stdout: true
                 description: Install zsh-autosuggestions
