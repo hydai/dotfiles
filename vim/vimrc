@@ -18,6 +18,7 @@
 
 " Setup Plug Support {
     " Initialize Plug.vim
+    let g:scomment_default_mapping = 0
     call plug#begin()
     " Misc
     Plug 'tpope/vim-surround'
