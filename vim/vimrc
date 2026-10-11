@@ -23,7 +23,6 @@
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
-    Plug 'sjl/gundo.vim'
     Plug 'junegunn/vim-easy-align'
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
@@ -43,7 +42,6 @@
     Plug 'kana/vim-textobj-indent'
     Plug 'reedes/vim-textobj-sentence'
     Plug 'reedes/vim-textobj-quote'
-    Plug 'dm4/vim-writer'
     " NerdTree
     Plug 'scrooloose/nerdtree'
     " Tag
@@ -102,20 +100,6 @@
         set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " A ruler on steroids
         set showcmd                 " Show partial commands in status line and
         " Selected characters/lines in visual mode
-    endif
-
-    if has('statusline')
-        set laststatus=2
-
-        " Broken down into easily includeable segments
-        set statusline=%<%f\                     " Filename
-        set statusline+=%w%h%m%r                 " Options
-        if !exists('g:override_spf13_bundles')
-            set statusline+=%{fugitive#statusline()} " Git Hotness
-        endif
-        set statusline+=\ [%{&ff}/%Y]            " Filetype
-        set statusline+=\ [%{getcwd()}]          " Current dir
-        set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
     endif
 
     set backspace=indent,eol,start  " Backspace for dummies
@@ -308,20 +292,6 @@
         call InitializeDirectories()
     " }
 
-    " Initialize NERDTree as needed {
-        function! NERDTreeInitAsNeeded()
-            redir => bufoutput
-            buffers!
-            redir END
-            let idx = stridx(bufoutput, "NERD_tree")
-            if idx > -1
-                NERDTreeMirror
-                NERDTreeFind
-                wincmd l
-            endif
-        endfunction
-    " }
-
     " Toggle mouse setting {
         function! ToggleMouse()
             if &mouse != 'nv'
@@ -455,14 +425,6 @@
         map <silent> <leader>cc <Plug>(do-comment)
         map <silent> <leader>cu <Plug>(un-comment)
         map <silent> <leader>co <Plug>(one-line-comment)
-    " }
-
-    " vim-writer {
-        autocmd BufReadPost,BufNewFile *.md set filetype=markdown
-    " }
-
-    " Gundo {
-        nmap <leader>gun :GundoToggle<CR>
     " }
 
     " Easy align {
