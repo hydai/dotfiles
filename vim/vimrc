@@ -69,14 +69,6 @@
     set iskeyword-=-                                " '-' is an end of word designator
 " }
 
-" Applications' Settings {
-    " Git {
-        " Instead of reverting the cursor to the last position in the buffer, we
-        " set it to the first line when editing a git commit message
-        au FileType gitcommit au! BufEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
-    " }
-" }
-
 " Vim UI {
     if filereadable(expand("~/.vim/plugged/vim-colors-solarized/colors/solarized.vim"))
         set t_Co=256
@@ -135,21 +127,22 @@
     "set matchpairs+=<:>             " Match, to be used with %
     set pastetoggle=,p           " pastetoggle (sane indentation on pastes)
     "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
-    " Remove trailing whitespaces and ^M chars
-    autocmd FileType c,cpp,java,php,javascript,python,rust,twig,xml,yml,perl,sql autocmd BufWritePre <buffer> call StripTrailingWhitespace()
-    autocmd Filetype c,cpp setlocal ts=2 sts=0 sw=2 expandtab
-    autocmd Filetype cmake setlocal ts=2 sts=0 sw=2 expandtab
-    autocmd Filetype javascript setlocal ts=2 sts=0 sw=2
-    autocmd Filetype yaml setlocal ts=2 sw=2 sts=2 expandtab
-    autocmd Filetype html setlocal ts=2 sts=0 sw=2 expandtab
-    autocmd Filetype htmldjango setlocal ts=2 sts=0 sw=2 expandtab
-    "autocmd FileType go autocmd BufWritePre <buffer> Fmt
-    autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
-    autocmd FileType haskell,ruby setlocal expandtab ts=2 sts=0 sw=2
-    " preceding line best in a plugin but here for now.
-    autocmd BufNewFile,BufRead *.coffee set filetype=coffee
-    autocmd FileType haskell setlocal commentstring=--\ %s " Workaround vim-commentary for Haskell
-    autocmd FileType haskell,rust setlocal nospell " Workaround broken colour highlighting in Haskell
+    augroup hydai_formatting
+        autocmd!
+        " Remove trailing whitespaces and ^M chars
+        autocmd BufWritePre * if index(['c', 'cpp', 'java', 'php', 'javascript', 'python', 'rust', 'twig', 'html.twig', 'xml', 'yaml', 'perl', 'sql'], &filetype) >= 0 | call StripTrailingWhitespace() | endif
+        autocmd FileType c,cpp setlocal ts=2 sts=0 sw=2 expandtab
+        autocmd FileType cmake setlocal ts=2 sts=0 sw=2 expandtab
+        autocmd FileType javascript setlocal ts=2 sts=0 sw=2
+        autocmd FileType yaml setlocal ts=2 sw=2 sts=2 expandtab
+        autocmd FileType html setlocal ts=2 sts=0 sw=2 expandtab
+        autocmd FileType htmldjango setlocal ts=2 sts=0 sw=2 expandtab
+        autocmd BufNewFile,BufRead *.html.twig setfiletype html.twig
+        autocmd FileType haskell,ruby setlocal expandtab ts=2 sts=0 sw=2
+        autocmd BufNewFile,BufRead *.coffee setfiletype coffee
+        autocmd FileType haskell setlocal commentstring=--\ %s
+        autocmd FileType haskell,rust setlocal nospell
+    augroup END
 " }
 
 " Key (re)Mappings {
@@ -237,6 +230,13 @@
         augroup resCur
             autocmd!
             autocmd BufWinEnter * call ResCur()
+        augroup END
+
+        " Keep Git commit messages at the first line instead of restoring the
+        " cursor position from a previous editing session.
+        augroup gitCommitCursor
+            autocmd!
+            autocmd BufWinEnter COMMIT_EDITMSG call setpos('.', [0, 1, 1, 0])
         augroup END
     " }
 
@@ -355,8 +355,11 @@
                     \ "Standard" : "C++17"}
 
         " map to <Leader>cf in C++ code
-        autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
-        autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
+        augroup clangFormatMappings
+            autocmd!
+            autocmd FileType c,cpp,objc nnoremap <buffer> <Leader>cf :<C-u>ClangFormat<CR>
+            autocmd FileType c,cpp,objc vnoremap <buffer> <Leader>cf :ClangFormat<CR>
+        augroup END
         " Toggle auto formatting:
         nmap <Leader>C :ClangFormatAutoToggle<CR>
     " }
@@ -463,11 +466,17 @@
         let g:indent_guides_auto_colors = 1
         let g:indent_guides_indent_levels = 2
         let g:indent_guides_guide_size = 1
-        autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=black   ctermbg=3
-        autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgray ctermbg=4
+        augroup indentGuidesColors
+            autocmd!
+            autocmd VimEnter,Colorscheme * hi IndentGuidesOdd  guibg=black   ctermbg=3
+            autocmd VimEnter,Colorscheme * hi IndentGuidesEven guibg=darkgray ctermbg=4
+        augroup END
     " }
 
     " Align GitHub-flavored Markdown tables {
-        au FileType markdown vmap <Leader><Bslash> :EasyAlign*<Bar><Enter>
+        augroup markdownAlignment
+            autocmd!
+            autocmd FileType markdown xnoremap <buffer> <Leader><Bslash> :EasyAlign*<Bar><Enter>
+        augroup END
     " }
 " }
