@@ -3,6 +3,7 @@
 ## First-Time Installation Workflow
 
 - Run `./setup.sh` from a temporary checkout to bootstrap a new machine.
+- The bootstrap checks for Python 3.7 or newer before running Dotbot.
 - On Debian-based Linux hosts the script installs the shell, Git, editor, and build dependencies with `apt-get`.
 - On macOS, install Homebrew first; the bootstrap installs tmux and the Git helpers, while the installer adds Universal Ctags, clang-format, and uv when they are missing.
 - The script clones the repository into `~/.dotfiles`, updates submodules, configures the push remote, and then executes `./install` from the new clone.

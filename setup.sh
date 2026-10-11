@@ -2,12 +2,15 @@
 
 set -euo pipefail
 
+BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 
 if [[ -e "$DOTFILES_DIR" ]]; then
   echo "Dotfiles destination already exists: $DOTFILES_DIR" >&2
   exit 1
 fi
+
+"${BASEDIR}/scripts/check-dotbot-python.sh"
 
 case "$(uname -s)" in
   Linux)

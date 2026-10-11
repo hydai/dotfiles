@@ -22,7 +22,7 @@
 ## Supporting Scripts & Submodules
 - `scripts/modify_git_author_email.sh` is a template for history rewrites; adjust the constants before running and avoid checking in personal data.
 - Submodule pointers live in `.gitmodules`; after updating `dotbot/` or `tmux/`, commit both the submodule SHA change and any generated lockfiles/config.
-- The bundled `dotbot/` directory contains upstream Dotbot; if you modify its Python, run `cd dotbot/test && ./test` inside the Vagrant VM described in `dotbot/test/README.md` (requires VirtualBox + Vagrant).
+- The bundled `dotbot/` directory contains upstream Dotbot; if you modify its Python, follow `dotbot/DEVELOPMENT.md` and run `hatch test` from the submodule.
 
 ## Common Workflows
 - Fresh setup: `./setup.sh` on a new machine (macOS/Linux) handles cloning and install; re-provisioning later only needs `./install`.
