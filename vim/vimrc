@@ -18,7 +18,6 @@
 
 " Setup Plug Support {
     " Initialize Plug.vim
-    let g:scomment_default_mapping = 0
     call plug#begin()
     " Misc
     Plug 'tpope/vim-surround'
@@ -31,8 +30,6 @@
     " Color
     Plug 'altercation/vim-colors-solarized'
     " Programming
-    Plug 'c9s/simple-commenter.vim'
-    Plug 'rhysd/vim-clang-format'
     Plug 'dense-analysis/ale'
     " Python
     Plug 'prabirshrestha/vim-lsp'
@@ -49,6 +46,10 @@
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
     call plug#end()
+
+    " Use Vim's bundled comment package without its default mappings.
+    let g:comment_mappings = v:false
+    packadd! comment
 " }
 
 " General {
@@ -57,7 +58,6 @@
     set mouse=nv                                    " Automatically enable mouse usage
     set mousehide                                   " Hide the mouse cursor while typing
     set shortmess+=filmnrxoOtT                      " Abbrev. of messages (avoids 'hit enter')
-    set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
     set virtualedit=onemore                         " Allow for cursor beyond last character
     set history=1000                                " Store a ton of history (default is 20)
     set spell                                       " Spell checking on
@@ -149,38 +149,38 @@
     let maplocalleader = '_'
 
     " Wrapped lines goes down/up to next row, rather than next line in file.
-    noremap j gj
-    noremap k gk
+    nnoremap j gj
+    nnoremap k gk
 
     " Yank from the cursor to the end of the line, to be consistent with C and D.
     nnoremap Y y$
 
     " Code folding options
-    nmap <leader>f0 :set foldlevel=0<CR>
-    nmap <leader>f1 :set foldlevel=1<CR>
-    nmap <leader>f2 :set foldlevel=2<CR>
-    nmap <leader>f3 :set foldlevel=3<CR>
-    nmap <leader>f4 :set foldlevel=4<CR>
-    nmap <leader>f5 :set foldlevel=5<CR>
-    nmap <leader>f6 :set foldlevel=6<CR>
-    nmap <leader>f7 :set foldlevel=7<CR>
-    nmap <leader>f8 :set foldlevel=8<CR>
-    nmap <leader>f9 :set foldlevel=9<CR>
+    nnoremap <leader>f0 :set foldlevel=0<CR>
+    nnoremap <leader>f1 :set foldlevel=1<CR>
+    nnoremap <leader>f2 :set foldlevel=2<CR>
+    nnoremap <leader>f3 :set foldlevel=3<CR>
+    nnoremap <leader>f4 :set foldlevel=4<CR>
+    nnoremap <leader>f5 :set foldlevel=5<CR>
+    nnoremap <leader>f6 :set foldlevel=6<CR>
+    nnoremap <leader>f7 :set foldlevel=7<CR>
+    nnoremap <leader>f8 :set foldlevel=8<CR>
+    nnoremap <leader>f9 :set foldlevel=9<CR>
 
     " Toggle search highlighting
-    nmap <silent> <leader>/ :set invhlsearch<CR>
+    nnoremap <silent> <leader>/ :set invhlsearch<CR>
 
     " Tab prev/next
-    nmap <silent> <leader>h :tabprev<CR>
-    nmap <silent> <leader>l :tabnext<CR>
+    nnoremap <silent> <leader>h :tabprev<CR>
+    nnoremap <silent> <leader>l :tabnext<CR>
 
     " Find merge conflict markers
-    map <leader>fc /\v^[<\|=>]( .*\|$)<CR>
+    nnoremap <leader>fc /\v^([<=>\|])\1{6}( .*)?$<CR>
 
     " Shortcuts
     " Change Working Directory to that of the current file
-    cmap cwd lcd %:p:h
-    cmap cd. lcd %:p:h
+    cnoremap cwd lcd %:p:h
+    cnoremap cd. lcd %:p:h
 
     " Visual shifting (does not exit Visual mode)
     vnoremap < <gv
@@ -191,7 +191,7 @@
     vnoremap . :normal .<CR>
 
     " For when you forget to sudo.. Really Write the file.
-    cmap w!! w !sudo tee % >/dev/null
+    cnoremap w!! w !sudo tee % >/dev/null
 
     " Easier formatting
     nnoremap <silent> <leader>q gwip
@@ -238,12 +238,6 @@
             set undolevels=1000         " Maximum number of changes that can be undone
             set undoreload=10000        " Maximum number lines to save for undo on a buffer reload
         endif
-
-        " Add exclusions to mkview and loadview
-        " eg: *.*, svn-commit.tmp
-        let g:skipview_files = [
-            \ '\[example pattern\]'
-            \ ]
     " }
 " }
 
@@ -255,15 +249,13 @@
             let prefix = 'vim'
             let dir_list = {
                         \ 'backup': 'backupdir',
-                        \ 'views': 'viewdir',
                         \ 'swap': 'directory' }
 
             if has('persistent_undo')
                 let dir_list['undo'] = 'undodir'
             endif
 
-            " To specify a different directory in which to place the vimbackup,
-            " vimviews, vimundo, and vimswap files/directories
+            " Store Vim backup, undo, and swap files outside working trees.
             let common_dir = parent . '/.' . prefix
             for [dirname, settingname] in items(dir_list)
                 let directory = common_dir . dirname . '/'
@@ -292,7 +284,7 @@
                 set mouse=""
             endif
         endfunction
-        map <leader>m :call ToggleMouse()<CR>
+        nnoremap <leader>m :call ToggleMouse()<CR>
     " }
 
     " Strip whitespace {
@@ -333,27 +325,36 @@
         set tags=./tags;/,./.git/tags;,~/.vimtags
     " }
 
-    " Clang-format {
-        let g:clang_format#style_options = {
-                    \ "AccessModifierOffset" : -4,
-                    \ "AllowShortIfStatementsOnASingleLine" : "true",
-                    \ "AlwaysBreakTemplateDeclarations" : "true",
-                    \ "Standard" : "C++17"}
-
-        " map to <Leader>cf in C++ code
-        augroup clangFormatMappings
-            autocmd!
-            autocmd FileType c,cpp,objc nnoremap <buffer> <Leader>cf :<C-u>ClangFormat<CR>
-            autocmd FileType c,cpp,objc vnoremap <buffer> <Leader>cf :ClangFormat<CR>
-        augroup END
-        " Toggle auto formatting:
-        nmap <Leader>C :ClangFormatAutoToggle<CR>
-    " }
-
-    " Python LSP {
+    " ALE {
         " Zuban owns Python diagnostics and language features. Keep ALE for
         " the other file types it supports.
         let g:ale_linters = {'python': []}
+        let g:ale_fixers = {
+                    \ 'c': ['clang-format'],
+                    \ 'cpp': ['clang-format'],
+                    \ 'objc': ['clang-format']}
+        let g:ale_c_clangformat_style_option =
+                    \ '{AccessModifierOffset: -4'
+                    \ . ', AllowShortIfStatementsOnASingleLine: true'
+                    \ . ', AlwaysBreakTemplateDeclarations: true'
+                    \ . ', Standard: c++17}'
+
+        function! s:ToggleALEFixOnSave() abort
+            let b:ale_fix_on_save = !get(
+                        \ b:, 'ale_fix_on_save', get(g:, 'ale_fix_on_save', 0))
+            echo 'ALE fix on save '
+                        \ . (b:ale_fix_on_save ? 'enabled' : 'disabled')
+        endfunction
+
+        augroup aleClangFormatMappings
+            autocmd!
+            autocmd FileType c,cpp,objc nnoremap <buffer> <silent> <Leader>cf :<C-u>ALEFix<CR>
+            autocmd FileType c,cpp,objc xnoremap <buffer> <silent> <Leader>cf :<C-u>ALEFix<CR>
+            autocmd FileType c,cpp,objc nnoremap <buffer> <silent> <Leader>C :<C-u>call <SID>ToggleALEFixOnSave()<CR>
+        augroup END
+    " }
+
+    " Python LSP {
         let g:lsp_async_completion = 1
         let g:lsp_signature_help_enabled = 1
         let g:lsp_signature_help_delay = 100
@@ -435,8 +436,8 @@
     " NerdTree {
         if isdirectory(expand("~/.vim/plugged/nerdtree"))
             nnoremap <silent> <C-e> :NERDTreeToggle<CR>
-            map <leader>e :NERDTreeFind<CR>
-            nmap <leader>nt :NERDTreeFind<CR>
+            nnoremap <leader>e :NERDTreeFind<CR>
+            nnoremap <leader>nt :NERDTreeFind<CR>
 
             let NERDTreeShowBookmarks=1
             let NERDTreeIgnore=['\.py[cd]$', '\~$', '\.swo$', '\.swp$', '^\.git$', '^\.hg$', '^\.svn$', '\.bzr$']
@@ -496,10 +497,60 @@
         endif
     " }
 
-    " Simple comments {
-        map <silent> <leader>cc <Plug>(do-comment)
-        map <silent> <leader>cu <Plug>(un-comment)
-        map <silent> <leader>co <Plug>(one-line-comment)
+    " Comments {
+        function! s:CommentToggleRequired(first, last, want_commented) abort
+            if empty(&l:commentstring) || !&l:modifiable
+                return 0
+            endif
+
+            let l:commentstring = substitute(
+                        \ substitute(&l:commentstring, '\S\zs%s\s*', ' %s', ''),
+                        \ '%s\ze\S', '%s ', '')
+            let l:parts = split(
+                        \ escape(l:commentstring, '*.\^$['), '\s*%s\s*')
+
+            if empty(l:parts)
+                return 0
+            endif
+
+            if len(l:parts) == 1
+                call add(l:parts, '')
+            endif
+
+            let l:all_commented = 1
+            for l:line_number in range(a:first, a:last)
+                let l:line = getline(l:line_number)
+                if l:line !~# '^\s*$'
+                            \ && l:line !~? '^\s*' . l:parts[0]
+                            \ . '.*' . l:parts[1] . '$'
+                    let l:all_commented = 0
+                    break
+                endif
+            endfor
+
+            return a:want_commented ? !l:all_commented : l:all_commented
+        endfunction
+
+        function! s:CommentLineMapping(want_commented) abort
+            return s:CommentToggleRequired(
+                        \ line('.'), line('.'), a:want_commented)
+                        \ ? "\<Plug>(comment-toggle-line)" : ''
+        endfunction
+
+        function! s:CommentSelectionMapping(want_commented) abort
+            let l:first = min([line('.'), line('v')])
+            let l:last = max([line('.'), line('v')])
+            return s:CommentToggleRequired(
+                        \ l:first, l:last, a:want_commented)
+                        \ ? "\<Plug>(comment-toggle)" : "\<Esc>"
+        endfunction
+
+        nmap <silent><expr> <leader>cc <SID>CommentLineMapping(1)
+        xmap <silent><expr> <leader>cc <SID>CommentSelectionMapping(1)
+        nmap <silent><expr> <leader>cu <SID>CommentLineMapping(0)
+        xmap <silent><expr> <leader>cu <SID>CommentSelectionMapping(0)
+        nmap <silent> <leader>co <Plug>(comment-toggle-line)
+        xmap <silent> <leader>co <Plug>(comment-toggle)
     " }
 
     " Easy align {
@@ -528,8 +579,8 @@
         xnoremap <Leader>a<Bar> :EasyAlign<Bar><CR>
     " }
 
-    " fsf {
-        map <leader>fzf :FZF<CR>
+    " FZF {
+        nnoremap <leader>fzf :FZF<CR>
     " }
 
     " vim indent guides {
