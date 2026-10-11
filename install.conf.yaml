@@ -34,6 +34,10 @@
                 stderr: true
                 description: Install oh-my-zsh
         -
+                command: vim -Nu NONE -n -es -i NONE +"silent mkspell! vim/spell/en.utf-8.add" +qall
+                stderr: true
+                description: Compile Vim spell additions
+        -
                 command: vim +PlugInstall +qall
                 stdout: true
                 description: Install vim plugin

@@ -20,8 +20,6 @@
     " Initialize Plug.vim
     call plug#begin()
     " Misc
-    Plug 'tomtom/tlib_vim'
-    Plug 'MarcWeber/vim-addon-mw-utils'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
@@ -32,10 +30,7 @@
     Plug 'nathanaelkane/vim-indent-guides'
     " Color
     Plug 'altercation/vim-colors-solarized'
-    Plug 'spf13/vim-colors'
-    Plug 'flazz/vim-colorschemes'
     " Programming
-    Plug 'godlygeek/tabular'
     Plug 'c9s/simple-commenter.vim'
     Plug 'rhysd/vim-clang-format'
     Plug 'w0rp/ale'
@@ -43,28 +38,19 @@
     Plug 'davidhalter/jedi-vim'
     " Golang
     Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-    " JSON
-    Plug 'elzr/vim-json'
-    " Solidity
-    Plug 'tomlion/vim-solidity'
     " Writing
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
     Plug 'reedes/vim-textobj-sentence'
     Plug 'reedes/vim-textobj-quote'
-    Plug 'reedes/vim-litecorrect'
     Plug 'dm4/vim-writer'
-    Plug 'junegunn/vim-easy-align'
     " NerdTree
     Plug 'scrooloose/nerdtree'
-    Plug 'jistr/vim-nerdtree-tabs'
     " Tag
     Plug 'majutsushi/tagbar'
     " Airline
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
-    " AI
-    Plug 'github/copilot.vim'
     call plug#end()
 " }
 
@@ -372,25 +358,6 @@
         augroup END
     " }
 
-    " VIM-AI {
-        let g:vim_ai_chat = {
-                    \  "options": {
-                    \    "model": "gpt-4o",
-                    \    "temperature": 0.7,
-                    \  },
-                    \}
-        " Notes:
-        " ui.paste_mode
-        " - if disabled code indentation will work but AI doesn't always respond with a code block
-        "   therefore it could be messed up
-        " - find out more in vim's help `:help paste`
-        " options.max_tokens
-        " - note that prompt + max_tokens must be less than model's token limit, see #42, #46
-        " - setting max tokens to 0 will exclude it from the OpenAI API request parameters, it is
-        "   unclear/undocumented what it exactly does, but it seems to resolve issues when the model
-        "   hits token limit, which respond with `OpenAI: HTTPError 400`
-    " }
-
     " TextObj Quote {
         augroup textobj_quote
             autocmd!
@@ -425,7 +392,7 @@
 
     " NerdTree {
         if isdirectory(expand("~/.vim/plugged/nerdtree"))
-            map <C-e> <plug>NERDTreeTabsToggle<CR>
+            nnoremap <silent> <C-e> :NERDTreeToggle<CR>
             map <leader>e :NERDTreeFind<CR>
             nmap <leader>nt :NERDTreeFind<CR>
 
@@ -436,28 +403,6 @@
             let NERDTreeMouseMode=2
             let NERDTreeShowHidden=1
             let NERDTreeKeepTreeInNewTab=1
-            let g:nerdtree_tabs_open_on_gui_startup=0
-        endif
-    " }
-
-    " Tabularize {
-        if isdirectory(expand("~/.vim/plugged/tabular"))
-            nmap <Leader>a& :Tabularize /&<CR>
-            vmap <Leader>a& :Tabularize /&<CR>
-            nmap <Leader>a= :Tabularize /^[^=]*\zs=<CR>
-            vmap <Leader>a= :Tabularize /^[^=]*\zs=<CR>
-            nmap <Leader>a=> :Tabularize /=><CR>
-            vmap <Leader>a=> :Tabularize /=><CR>
-            nmap <Leader>a: :Tabularize /:<CR>
-            vmap <Leader>a: :Tabularize /:<CR>
-            nmap <Leader>a:: :Tabularize /:\zs<CR>
-            vmap <Leader>a:: :Tabularize /:\zs<CR>
-            nmap <Leader>a, :Tabularize /,<CR>
-            vmap <Leader>a, :Tabularize /,<CR>
-            nmap <Leader>a,, :Tabularize /,\zs<CR>
-            vmap <Leader>a,, :Tabularize /,\zs<CR>
-            nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
-            vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
         endif
     " }
 
@@ -469,18 +414,17 @@
 
     " Fugitive {
         if isdirectory(expand("~/.vim/plugged/vim-fugitive/"))
-            nnoremap <silent> <leader>gs :Gstatus<CR>
-            nnoremap <silent> <leader>gd :Gdiff<CR>
-            nnoremap <silent> <leader>gc :Gcommit<CR>
-            nnoremap <silent> <leader>gb :Gblame<CR>
-            nnoremap <silent> <leader>gl :Glog<CR>
+            nnoremap <silent> <leader>gs :Git<CR>
+            nnoremap <silent> <leader>gd :Gdiffsplit<CR>
+            nnoremap <silent> <leader>gc :Git commit<CR>
+            nnoremap <silent> <leader>gb :Git blame<CR>
+            nnoremap <silent> <leader>gl :Git log<CR>
             nnoremap <silent> <leader>gp :Git push<CR>
             nnoremap <silent> <leader>gr :Gread<CR>
             nnoremap <silent> <leader>gw :Gwrite<CR>
             nnoremap <silent> <leader>ge :Gedit<CR>
             " Mnemonic _i_nteractive
             nnoremap <silent> <leader>gi :Git add -p %<CR>
-            nnoremap <silent> <leader>gg :SignifyToggle<CR>
         endif
     " }
 
@@ -527,6 +471,24 @@
 
         " Start interactive EasyAlign for a motion/text object (e.g. gaip)
         nmap ga <Plug>(EasyAlign)
+
+        " Preserve the delimiter-specific alignment shortcuts from Tabular.
+        nnoremap <Leader>a& :EasyAlign&<CR>
+        xnoremap <Leader>a& :EasyAlign&<CR>
+        nnoremap <Leader>a= :EasyAlign=<CR>
+        xnoremap <Leader>a= :EasyAlign=<CR>
+        nnoremap <Leader>a=> :EasyAlign /=>/<CR>
+        xnoremap <Leader>a=> :EasyAlign /=>/<CR>
+        nnoremap <Leader>a: :EasyAlign:<CR>
+        xnoremap <Leader>a: :EasyAlign:<CR>
+        nnoremap <Leader>a:: :EasyAlign /:\zs/<CR>
+        xnoremap <Leader>a:: :EasyAlign /:\zs/<CR>
+        nnoremap <Leader>a, :EasyAlign,<CR>
+        xnoremap <Leader>a, :EasyAlign,<CR>
+        nnoremap <Leader>a,, :EasyAlign /,\zs/<CR>
+        xnoremap <Leader>a,, :EasyAlign /,\zs/<CR>
+        nnoremap <Leader>a<Bar> :EasyAlign<Bar><CR>
+        xnoremap <Leader>a<Bar> :EasyAlign<Bar><CR>
     " }
 
     " fsf {
