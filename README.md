@@ -8,6 +8,7 @@
 - On macOS, install Homebrew first; the bootstrap installs tmux and the Git helpers, while the installer adds Universal Ctags, clang-format, and uv when they are missing.
 - The script clones the repository into `~/.dotfiles`, updates submodules, configures the push remote, and then executes `./install` from the new clone.
 - `install` makes sure the Dotbot submodule is present, installs Oh My Zsh and the Vim command-line dependencies (Universal Ctags, clang-format, and Zuban), and applies the symlink/configuration rules defined in `install.conf.yaml`.
+- The `tmux/` submodule tracks upstream Oh my tmux; repository-specific settings live in the top-level `tmux.conf.local` override.
 - Git commit signing uses the key configured in `git/gitconfig`; import its private key and install a `gpg` command before committing on a new machine.
 
 Example invocation on a fresh machine:
@@ -44,8 +45,8 @@ cd ~/.dotfiles
 ├── svn
 │   └── svn_log_short
 ├── tmux
-│   ├── tmux.conf
-│   └── tmux.conf.local
+│   └── .tmux.conf
+├── tmux.conf.local
 └── vim
     ├── spell
     │   └── en.utf-8.add

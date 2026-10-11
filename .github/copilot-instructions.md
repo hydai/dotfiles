@@ -1,7 +1,7 @@
 # Copilot Instructions
 - This repo provisions hydai's development environment by symlinking curated dotfiles via Dotbot; most edits adjust config in `install.conf.yaml` or the files it links.
 - Top-level scripts: `install` ensures the `dotbot/` submodule is pulled before running Dotbot, while `setup.sh` is a one-step bootstrap that clones the repo, updates submodules, and runs `./install`.
-- Dotfiles live in tool-specific folders (`oh-my-zsh/`, `tmux/`, `vim/`, `git/`, etc.); `tmux/` and `dotbot/` are submodules, so prefer changes in their source repos or commit the submodule update explicitly.
+- Dotfiles live in tool-specific folders (`oh-my-zsh/`, `vim/`, `git/`, etc.); `tmux/` tracks upstream Oh my tmux and `dotbot/` tracks upstream Dotbot as submodules, while repo-owned tmux customizations belong in the top-level `tmux.conf.local`.
 
 ## Dotbot Configuration Patterns
 - `install.conf.yaml` drives provisioning; link defaults enable `create` and `relink`, `clean` prunes stray links under `$HOME`, `link` maps homedir targets to repo files, and `shell` runs provisioning commands. Keep the Oh My Zsh installation step before links under `~/.oh-my-zsh`.
@@ -21,7 +21,7 @@
 
 ## Supporting Scripts & Submodules
 - `scripts/modify_git_author_email.sh` is a template for history rewrites; adjust the constants before running and avoid checking in personal data.
-- Submodule pointers live in `.gitmodules`; after updating `dotbot/` or `tmux/`, commit both the submodule SHA change and any generated lockfiles/config.
+- Submodule pointers live in `.gitmodules`; after updating `dotbot/` or `tmux/`, commit both the submodule SHA change and any related config. Do not customize the `tmux/` submodule directly; keep local overrides in `tmux.conf.local`.
 - The bundled `dotbot/` directory contains upstream Dotbot; if you modify its Python, follow `dotbot/DEVELOPMENT.md` and run `hatch test` from the submodule.
 
 ## Common Workflows

@@ -21,10 +21,10 @@
                 path: screen/screenrc
         ~/.tmux.conf:
                 force: true
-                path: tmux/tmux.conf
+                path: tmux/.tmux.conf
         ~/.tmux.conf.local:
                 force: true
-                path: tmux/tmux.conf.local
+                path: tmux.conf.local
         ~/.vim:
                 force: true
                 path: vim
