@@ -20,21 +20,33 @@ case "$(uname -s)" in
     sudo -H apt-get install -y \
       build-essential \
       ca-certificates \
+      clang-format \
       cmake \
       curl \
+      gh \
       git \
+      git-delta \
+      git-lfs \
+      gnupg \
+      screen \
       tmux \
       universal-ctags \
       vim \
       zsh
     ;;
   Darwin)
-    if ! command -v brew >/dev/null 2>&1 \
-      && [[ ! -x /opt/homebrew/bin/brew ]] \
-      && [[ ! -x /usr/local/bin/brew ]]; then
+    if command -v brew >/dev/null 2>&1; then
+      brew_bin="$(command -v brew)"
+    elif [[ -x /opt/homebrew/bin/brew ]]; then
+      brew_bin=/opt/homebrew/bin/brew
+    elif [[ -x /usr/local/bin/brew ]]; then
+      brew_bin=/usr/local/bin/brew
+    else
       echo "Homebrew is required on macOS. Install it before running setup.sh." >&2
       exit 1
     fi
+
+    "$brew_bin" install difftastic gh git-delta git-lfs tmux
     ;;
   *)
     echo "Unsupported operating system: $(uname -s)" >&2

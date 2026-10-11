@@ -6,6 +6,9 @@
 	gpgsign = true
 [alias]
 	cis = commit -S
+	dft = -c diff.external=difft diff
+	dshow = -c diff.external=difft show --ext-diff
+	dlog = -c diff.external=difft log -p --ext-diff
 [gpg]
 	program = gpg
 [filter "lfs"]
@@ -40,3 +43,9 @@
 	hunk-header-file-style = red
 	hunk-header-line-number-style = "#067a00"
 	hunk-header-style = file line-number syntax
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential

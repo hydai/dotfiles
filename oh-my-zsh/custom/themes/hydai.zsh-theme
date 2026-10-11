@@ -31,10 +31,10 @@
 #   HYDAI_SHOW_CHANGESET=true
 #
 # Set the length of the hash/changeset if enabled in the `vcs` segment:
-HYDAI_CHANGESET_HASH_LENGTH=6
+HYDAI_CHANGESET_HASH_LENGTH=${HYDAI_CHANGESET_HASH_LENGTH:-6}
 #
 # Make a double-lined prompt:
-HYDAI_PROMPT_ON_NEWLINE=true
+HYDAI_PROMPT_ON_NEWLINE=${HYDAI_PROMPT_ON_NEWLINE:-true}
 #
 # Set the colorscheme:
 #   HYDAI_COLOR_SCHEME='light'
@@ -51,18 +51,12 @@ LEFT_SEGMENT_SEPARATOR=''
 RIGHT_SEGMENT_SEPARATOR=''
 VCS_STAGED_ICON='✚'
 VCS_UNSTAGED_ICON='✗'
-VCS_UNTRACKED_ICON='… '
-VCS_AHEAD_ICON='↑ '
-VCS_BEHIND_ICON='↓ '
-VCS_CONFLICTS_ICON='✖ '
-VCS_STASHED_ICON='⚑'
-VCS_CLEAN_ICON='✔ '
 
 ################################################################
 # color scheme
 ################################################################
 
-local DEFAULT_COLOR DEFAULT_COLOR_INVERTED DEFAULT_COLOR_DARK
+typeset -g DEFAULT_COLOR='' DEFAULT_COLOR_INVERTED='' DEFAULT_COLOR_DARK=''
 if [[ $HYDAI_COLOR_SCHEME == "light" ]]; then
   DEFAULT_COLOR=white
   DEFAULT_COLOR_INVERTED=black
@@ -73,8 +67,8 @@ else
   DEFAULT_COLOR_DARK="236"
 fi
 
-local VCS_FOREGROUND_COLOR=$DEFAULT_COLOR
-local VCS_FOREGROUND_COLOR_DARK=$DEFAULT_COLOR_DARK
+typeset -g VCS_FOREGROUND_COLOR=$DEFAULT_COLOR
+typeset -g VCS_FOREGROUND_COLOR_DARK=$DEFAULT_COLOR_DARK
 
 # If user has defined custom colors for the `vcs` segment, override the defaults
 if [[ -n $HYDAI_VCS_FOREGROUND ]]; then
@@ -89,13 +83,13 @@ fi
 ################################################################
 
 setopt prompt_subst
-autoload -Uz vcs_info
+autoload -Uz vcs_info vcs_info_hookadd vcs_info_hookdel
 
-local VCS_WORKDIR_DIRTY=false
-local VCS_CHANGESET_PREFIX=''
+typeset -g VCS_WORKDIR_DIRTY=false
+typeset -g VCS_CHANGESET_PREFIX=''
 if [[ "$HYDAI_SHOW_CHANGESET" == true ]]; then
   # Default: Just display the first 6 characters of our changeset-ID.
-  local VCS_CHANGESET_HASH_LENGTH=6
+  typeset -g VCS_CHANGESET_HASH_LENGTH=6
   if [[ -n $HYDAI_CHANGESET_HASH_LENGTH ]]; then
     VCS_CHANGESET_HASH_LENGTH=$HYDAI_CHANGESET_HASH_LENGTH
   fi
@@ -298,6 +292,11 @@ function +vi-vcs-detect-changes() {
   fi
 }
 
+# Register this hook once so reloading the theme does not multiply the work
+# performed by every prompt.
+vcs_info_hookdel -a set-message vcs-detect-changes >/dev/null 2>&1
+vcs_info_hookadd set-message vcs-detect-changes
+
 ################################################################
 # Prompt Segments
 ################################################################
@@ -329,7 +328,7 @@ prompt_longstatus() {
   symbols=()
 
   if [[ $RETVAL -ne 0 ]]; then
-    symbols+="%{%F{"226"}%}%? ↵"
+    symbols+="%{%F{"226"}%}$RETVAL ↵"
     bg="009"
   else
     symbols+="%{%F{"046"}%}✓"
@@ -352,21 +351,6 @@ prompt_status() {
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
   [[ -n "$symbols" ]] && $1_prompt_segment $0 $DEFAULT_COLOR default "$symbols"
-}
-
-# Show a ratio of tests vs code
-build_test_stats() {
-  local code_amount=$3
-  local tests_amount=$4+0.00001
-  local headline=$5
-
-  # Set float precision to 2 digits:
-  typeset -F 2 ratio
-  local ratio=$(( (tests_amount/code_amount) * 100 ))
-
-  [[ ratio -ge 0.75 ]] && $1_prompt_segment ${2}_GOOD cyan $DEFAULT_COLOR "$headline: $ratio%%"
-  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment $2_AVG yellow $DEFAULT_COLOR "$headline: $ratio%%"
-  [[ ratio -lt 0.5 ]] && $1_prompt_segment $2_BAD red $DEFAULT_COLOR "$headline: $ratio%%"
 }
 
 # System time
@@ -398,8 +382,6 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  RETVAL=$?
-
   if [[ ${#HYDAI_RIGHT_PROMPT_ELEMENTS} == 0 ]]; then
     HYDAI_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
   fi
@@ -410,10 +392,8 @@ build_right_prompt() {
 }
 
 precmd() {
+  RETVAL=$?
   vcs_info
-
-  # Add a static hook to examine staged/unstaged changes.
-  vcs_info_hookadd set-message vcs-detect-changes
 }
 
 if [[ "$HYDAI_PROMPT_ON_NEWLINE" == true ]]; then

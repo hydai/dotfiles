@@ -13,6 +13,10 @@ has_universal_ctags() {
   [[ "${version%%$'\n'*}" == "Universal Ctags"* ]]
 }
 
+has_clang_format() {
+  command -v clang-format >/dev/null 2>&1
+}
+
 find_brew() {
   if command -v brew >/dev/null 2>&1; then
     command -v brew
@@ -58,6 +62,43 @@ install_universal_ctags() {
 
   if ! has_universal_ctags; then
     echo "Universal Ctags was installed but is not available as 'ctags'." >&2
+    exit 1
+  fi
+}
+
+install_clang_format() {
+  if has_clang_format; then
+    return
+  fi
+
+  case "$(uname -s)" in
+    Darwin)
+      local brew_bin
+      local brew_prefix
+      brew_bin="$(find_brew)" || {
+        echo "Homebrew is required to install clang-format on macOS." >&2
+        exit 1
+      }
+      "$brew_bin" install clang-format
+      brew_prefix="$("$brew_bin" --prefix)"
+      export PATH="$brew_prefix/bin:$PATH"
+      ;;
+    Linux)
+      if ! command -v apt-get >/dev/null 2>&1; then
+        echo "apt-get is required to install clang-format on Linux." >&2
+        exit 1
+      fi
+      sudo -H apt-get update
+      sudo -H apt-get install -y clang-format
+      ;;
+    *)
+      echo "Unsupported operating system: $(uname -s)" >&2
+      exit 1
+      ;;
+  esac
+
+  if ! has_clang_format; then
+    echo "clang-format was installed but is not available on PATH." >&2
     exit 1
   fi
 }
@@ -122,8 +163,10 @@ install_zuban() {
 }
 
 install_universal_ctags
+install_clang_format
 uv_bin="$(install_uv)"
 install_zuban "$uv_bin"
 
 ctags --version | sed -n '1p'
+clang-format --version
 "$("$uv_bin" tool dir --bin)/zuban" --version

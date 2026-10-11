@@ -1,13 +1,24 @@
 - defaults:
-        relink: true
-        create: true
+        link:
+                relink: true
+                create: true
 
 - clean: ['~']
+
+- shell:
+        -
+                command: test -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" || KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+                stdout: true
+                stderr: true
+                description: Install oh-my-zsh
 
 - link:
         ~/.gitconfig:
                 force: true
                 path: git/gitconfig
+        ~/.screenrc:
+                force: true
+                path: screen/screenrc
         ~/.tmux.conf:
                 force: true
                 path: tmux/tmux.conf
@@ -28,11 +39,6 @@
                 path: oh-my-zsh/zshrc
 
 - shell:
-        -
-                command: test -d "$HOME/.oh-my-zsh" || KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-                stdout: true
-                stderr: true
-                description: Install oh-my-zsh
         -
                 command: ./scripts/install-vim-tools.sh
                 stdout: true

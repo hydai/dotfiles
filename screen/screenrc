@@ -17,11 +17,11 @@ shelltitle '$ |bash'
 # Disable vbell
 vbell off
 
-# Keboard binding
+# Keyboard bindings
 # bind F11 to move to previous window
 bindkey -k F1 prev
 # bind F12 to move to next window
-bindkey -k F2 next 
+bindkey -k F2 next
 # bind Alt`~= to screen0~12
 bindkey "^[`" select 0
 bindkey "^[1" select 1
@@ -48,7 +48,5 @@ bindkey -k k; title
 # C + right : next
 bindkey "^[[1;5C" next
 bindkey "^[O5C" next
-bindkey "^[[C" next
 bindkey "^[[1;5D" prev
 bindkey "^[O5D" prev
-bindkey "^[[D" prev

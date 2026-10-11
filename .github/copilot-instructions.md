@@ -4,7 +4,7 @@
 - Dotfiles live in tool-specific folders (`oh-my-zsh/`, `tmux/`, `vim/`, `git/`, etc.); `tmux/` and `dotbot/` are submodules, so prefer changes in their source repos or commit the submodule update explicitly.
 
 ## Dotbot Configuration Patterns
-- `install.conf.yaml` drives provisioning; defaults enable `create` and `relink`, `clean` prunes stray links under `$HOME`, `link` maps homedir targets to repo files, and `shell` runs post-link commands.
+- `install.conf.yaml` drives provisioning; link defaults enable `create` and `relink`, `clean` prunes stray links under `$HOME`, `link` maps homedir targets to repo files, and `shell` runs provisioning commands. Keep the Oh My Zsh installation step before links under `~/.oh-my-zsh`.
 - When adding new links, prefer relative paths under the repo and set `force/relink` explicitly if idempotence requires it; keep `shell` commands safe to run multiple times because Dotbot invokes them each install.
 - Shell steps already cover oh-my-zsh install, `vim +PlugInstall +qall`, and cloning `zsh-syntax-highlighting` / `zsh-autosuggestions`; match that style if you add more tooling installers.
 - Update `install.conf.yaml` after adding new dotfiles so they are actually linked; forgetting this is the most common drift.
@@ -26,7 +26,7 @@
 
 ## Common Workflows
 - Fresh setup: `./setup.sh` on a new machine (macOS/Linux) handles cloning and install; re-provisioning later only needs `./install`.
-- After editing dotfiles, run `./install` to re-link and trigger post-install steps; override the target home directory with `./install -d /tmp/dotfiles-test` for safe dry-runs.
+- After editing dotfiles, run `./install` to re-link and trigger post-install steps. For an isolated link-only check, set `HOME` to a temporary directory and invoke Dotbot directly with `--only link`; `-d` selects Dotbot's source directory, not the target home.
 - For macOS-specific changes touching Homebrew paths, ensure the command works under the `case Darwin)` branch in `oh-my-zsh/zshrc`.
 
 ## Collaboration Notes
